@@ -1,0 +1,270 @@
+儲存空間即將用盡 … 儲存空間耗盡後，你就無法建立、編輯及上傳檔案。
+header{
+    border: 1px solid rgb(80, 155, 180);
+    padding: 30px;
+    text-align: center;
+}
+
+aside{
+    border: 1px solid rgb(80, 155, 180);
+    margin: 10px;
+}
+
+aside ul{
+    margin: 5px 0;
+    padding: 5px;
+}
+
+aside li{
+    list-style: none;
+    margin: 10px;
+}
+
+.container{
+    border: 1px solid rgb(80, 155, 180);
+    display: flex;
+}
+
+main{
+    border: 1px solid rgb(80, 155, 180);
+    padding: 5px;
+    width: 1500px;
+    margin: 10px;
+}
+
+.select-box-label{
+    border-right: 3px solid rgb(80, 155, 180);
+    margin: 0 5px 0 0;
+}
+
+.search-box{
+    border: 1px solid rgb(80, 155, 180);
+    border-radius: 5px;
+    width: 405px;
+}
+
+#search-condition{
+    border: none;
+    border-radius: 10px;
+    padding: 2px;
+    outline: none;
+}
+
+#search-inupt-box{
+    border: 0px;
+    outline: none;
+    text-align: center;
+}
+
+#paid-condition{
+    border: none;
+    border-radius: 10px;
+    padding: 2px;
+    outline: none;
+}
+
+#search-btn{
+    margin: 3px 5px 3px 0px;
+    border-radius: 4.5px;
+    color: rgb(241, 241, 241);
+    background-color: rgb(28, 146, 185);
+    border: 1px solid rgb(28, 146, 185);
+}
+
+.confirm-modify{
+    position: absolute; 
+    bottom: 60px;
+    right: 75px;
+}
+
+.title-box{
+    border: 1px solid rgb(80, 155, 180);
+    text-align: center;
+    margin-top: 10px;
+}
+
+.dt-column-title{
+	font-size: 14px;
+}
+
+#adtable th, #adtable td {
+    text-align: left;
+    vertical-align: middle;
+}
+
+.details-btn{
+    color:rgb(73, 69, 54);
+    background-color: rgb(245, 221, 145);
+    border-radius: 3px;
+    border: 1px solid rgb(174, 153, 85);
+}
+
+
+/* ad details - css*/
+.ad-detail-box{
+    border-top: 3px solid;
+    border-color: rgb(80, 155, 180);
+    text-align: center;
+    /* display: none; */
+    width: 100%;
+    margin: 0 auto;
+}
+
+
+#ad-details-table{
+    position: relative;
+    width:100%;
+    display: block;
+}
+
+#ad-details-table thead{
+    float:left;
+}
+
+#ad-details-table th, #ad-details-table td {
+    text-align: center;
+    line-height: 30px;
+    height: 30px;
+    display: block;
+    border-bottom: 1.5px solid rgb(44, 104, 124);
+}
+
+.main-column{
+    width: 200px;
+}
+
+
+#ad-details-table tbody tr td{
+    width: 200px;
+}
+
+#ad-details-table tbody input{
+    text-align: center;
+}
+
+#ad-details-table tbody select{
+    height: 20.5px;
+    width: 169px;
+    text-align: center;
+}
+
+#user-details-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#user-details-table th,
+#user-details-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+#user-details-table th {
+  background-color: #f2f2f2;
+  text-align: left;
+  font-weight: bold;
+  width: 30%; /* 讓欄位名稱佔30%寬度 */
+}
+
+#user-details-table td {
+  text-align: left;
+  width: 70%; /* 數據欄位佔70%寬度 */
+}
+
+.user-picture img {
+  display: block;
+  max-width: 100px;
+  height: auto;
+}
+#user-details-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#user-details-table th,
+#user-details-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+#user-details-table th {
+  background-color: #f2f2f2;
+  text-align: left;
+  font-weight: bold;
+  width: 30%; /* 讓欄位名稱佔30%寬度 */
+}
+
+#user-details-table td {
+  text-align: left;
+  width: 70%; /* 數據欄位佔70%寬度 */
+}
+
+.user-picture img {
+  display: block;
+  max-width: 100px;
+  height: auto;
+}
+
+#user-details-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  #user-details-table th,
+  #user-details-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+  
+  #user-details-table th {
+    background-color: #f2f2f2;
+    text-align: left;
+    font-weight: bold;
+    width: 30%; /* 讓欄位名稱佔30%寬度 */
+  }
+  
+  #user-details-table td {
+    text-align: left;
+    width: 70%; /* 數據欄位佔70%寬度 */
+  }
+  
+  .user-picture img {
+    display: block;
+    max-width: 100px;
+    height: auto;
+  }
+
+  #usertable {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  #usertable th,
+  #usertable td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center; /* 置中對齊 */
+  }
+  
+  #usertable th {
+    background-color: #f2f2f2;
+  }
+  
+  .action {
+    text-align: right; /* 讓按鈕靠右對齊 */
+  }
+  
+  .action-btn {
+    padding: 8px 16px;
+    background-color: #4CAF50; /* 綠色背景 */
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .action-btn:hover {
+    background-color: #45a049; /* 按鈕的 hover 效果 */
+  }
+
+  
