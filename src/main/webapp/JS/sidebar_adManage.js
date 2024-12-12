@@ -1,8 +1,10 @@
-$(document).ready(function() {
+"use strict";
 
-	// 取出固定不變的元素
-	let searchBtn;
-	let tableInitial;
+// 取出固定不變的元素
+let searchBtn;
+let tableInitial;
+
+$(document).ready(function() {
 
 	// 回傳的ads資料
 	let ads = [];
@@ -10,26 +12,17 @@ $(document).ready(function() {
 	// 選取所有的 buttons
 	const btns = document.querySelectorAll(".btn");
 	btns.forEach((btn) => {
-	  btn.addEventListener("click", {
-	    once: true,
-	  });
+		btn.addEventListener("click", {
+			once: true,
+		});
 	});
 
 	searchBtn = document.getElementById("search");
-	
+
 	loadTable();
 
+	// async: 頁面載入時，確保在獲取所有資料之前不會繼續執行其他程式碼
 	async function loadTable() {
-		
-		// 選取所有的 buttons
-		const btns = document.querySelectorAll(".btn");
-		btns.forEach((btn) => {
-		  btn.addEventListener("click", {
-		    once: true,
-		  });
-		});
-
-		searchBtn = document.getElementById("search");
 
 		// 銷毀舊的 DataTable 實例（如果存在）
 		if ($.fn.DataTable.isDataTable('#adTable')) {
@@ -63,7 +56,8 @@ $(document).ready(function() {
 					title: "操作功能",
 					data: null,
 					render: function(data, type, row) {
-						return `<button type="button" class="btn btn-warning btn-sm details-btn">詳細資料</button>`;
+						return `<button type="button" class="btn btn-warning btn-sm details-btn">詳細資料</button>`
+							+ `<button type="button" class="btn delete-btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModelBox">刪除廣告</button>`;
 					},
 				},
 			],
@@ -85,7 +79,10 @@ $(document).ready(function() {
 			let clickedButton = $(event.target);
 
 			// 判斷點擊的是否為非修改按鈕
-			if (!clickedButton.hasClass('modify') && !clickedButton.hasClass('submit') && !clickedButton.hasClass('cancel')) {
+			if (!clickedButton.hasClass('modify')
+				&& !clickedButton.hasClass('submit')
+				&& !clickedButton.hasClass('cancel')
+				&& !clickedButton.hasClass('delete-btn')) {
 				resetModifyButtons();
 			}
 		});
@@ -95,6 +92,17 @@ $(document).ready(function() {
 		// 4. 確認廣告詳細 > 結束
 		checkDetails(ads, tableInitial);
 
+		// 5. 刪除廣告
+
+		$("#adtable tbody").on("click", ".delete-btn", async function() {
+			let rowAdId = tableInitial.row($(this).closest("tr")).data().adId;
+			if (tableInitial.row($(this).closest("tr")).data().isPaid === "已付款") {
+				alert("廣告已付款，無法刪除")
+			} else if (confirm("確定要刪除該廣告嗎？")) {
+				deleteAd(ads, tableInitial, rowAdId);
+			}
+
+		});
 	} // loadTable
 
 });
@@ -105,17 +113,18 @@ $(document).ready(function() {
 async function displayData({ ads, tableInitial, searchParams }) {
 	if (!searchParams.input) searchParams.input = "";
 	let dataToSend = [
-		searchParams.condition || "adId",
-		searchParams.input.trim() || "",
+		"search",
+		searchParams.condition || "all",
 		searchParams.paid || "all",
+		searchParams.input.trim() || "",
 	];
 
 	// debugging
-	console.log(dataToSend);
+	console.log("display all data to sedn: " + dataToSend);
 
 	try {
 		let fetchedAds = await fetchData(
-			"http://localhost:8080/rent_web/GetAdDataServlet.do",
+			"http://localhost:8080/rent_web/AdDataOperationServelt.do",
 			dataToSend
 		);
 
@@ -137,9 +146,16 @@ async function searchData(ads, tableInitial) {
 	// 取得搜尋條件及值
 	let searchParams = {
 		condition: document.getElementById("search-condition").value,
-		input: document.getElementById("search-inupt-box").value,
 		paid: document.getElementById("paid-condition").value,
+		input: document.getElementById("search-inupt-box").value,
 	};
+	
+	const inputReg = /^[a-zA-Z0-9- ]*$|^$/
+		
+	if(!inputReg.test(searchParams.input)){
+		alert("輸入值只能包含數字、英文字母及 - 符號，或全空白");
+		return;
+	}
 
 	// 呼叫 displayData() 以顯示結果
 	const resultAds = await displayData({ ads, tableInitial, searchParams });
@@ -163,14 +179,26 @@ async function checkDetails(ads, tableInitial) {
 			console.log("rowData:" + rowAdId);
 
 			// 顯示廣告詳細表內容
-			let retrievedAds = displayAdDetails(ads, tableInitial, rowAdId);
+			let retrievedAd = await displayAdDetails(ads, tableInitial, rowAdId);
+			
+			if(retrievedAd[0].isPaid === "未付款"){
+				$(".modify.btn").html("修改資料");
+				$(".modify.btn").prop('disabled', false);
+			}
+			
+			// 如果已付款 > 選取修改按鈕
+			if (retrievedAd[0].isPaid === "已付款") {
+				$(".modify.btn").html("無法修改");
+				$(".modify.btn").prop('disabled', true);
 
-			// 點擊修改廣告內容 + 取消修改
-			$(".button-box").off("click", ".modify.btn").on("click", ".modify.btn", async function() {
-				let modifyBtn = this;
-				modifyDetails(retrievedAds, tableInitial, modifyBtn);
-			});
-
+			} else {
+				// 點擊修改廣告內容 + 取消修改
+				$(".button-box").off("click", ".modify.btn").on("click", ".modify.btn", async function() {
+					console.log(this)
+					let modifyBtn = document.querySelector('.modify.btn');
+					await modifyDetails(retrievedAd, tableInitial, modifyBtn);
+				});
+			}
 			// 點擊結束編輯 = 結束查看廣告詳細資料
 			$(".button-box").on("click", ".leave.btn", async function() {
 				endupChecking();
@@ -181,7 +209,6 @@ async function checkDetails(ads, tableInitial) {
 				AdDetailsBox.style.display = "none";
 			});
 
-
 		} catch (error) {
 			console.log("fetch error:", error);
 		}
@@ -189,10 +216,11 @@ async function checkDetails(ads, tableInitial) {
 }
 
 // 3.
-// 修改資料：內容廣告修改
+// 修改資料：廣告內容修改
 async function modifyDetails(ads, tableInitial, modifyBtn) {
-
-	// 直接在函式內部獲取當前的廣告信息，確保是最新的值
+	console.log(modifyBtn)
+	
+	// 直接在函式內部獲取當前的廣告訊息，確保是最新的值
 	let adId = document.querySelector('.ad-id').textContent;
 	let adTypeElement = document.querySelector(".ad-type");
 	let quantityElement = document.querySelector(".ad-quantity");
@@ -304,16 +332,10 @@ async function submitModification(ads, tableInitial, buttons, modifiedParameters
 
 	// 取得使用者輸入資料 -> 更新表單內容
 	let dataToSend = [
+		"adUpdate",
 		modifiedParameters.adId,
 		modifiedParameters.adTypeSelected.value,
-		"", // duration
-		"", // unit price
 		modifiedParameters.quantityInput.value,
-		"", // created time
-		"", // is paid
-		"", // order id
-		"", // paid date
-		"" // expires at
 	];
 
 	// debugging
@@ -321,7 +343,7 @@ async function submitModification(ads, tableInitial, buttons, modifiedParameters
 
 	// 傳更改資料給servlet，並獲取更新資料
 	let fetchedDetails = await fetchData(
-		"http://localhost:8080/rent_web/UpdateAdDataServelt.do",
+		"http://localhost:8080/rent_web/AdDataOperationServelt.do",
 		dataToSend
 	);
 
@@ -350,6 +372,33 @@ function endupChecking() {
 	let AdDetailsBox = document.querySelector(".ad-details-box");
 	AdDetailsBox.style.display = "none";
 }
+
+// 7. 刪除廣告（若已付款，則無法刪除）
+async function deleteAd(ads, tableInitial, rowAdId) {
+
+	// 取得使用者輸入資料 -> 更新表單內容
+	let dataToSend = ["adDelete", rowAdId];
+
+	// debugging
+	console.log("data to send: " + dataToSend);
+
+	// 傳更改資料給servlet，並獲取更新資料
+	await fetchData(
+		"http://localhost:8080/rent_web/AdDataOperationServelt.do",
+		dataToSend
+	);
+
+	dataToSend = ["search", "all", "all", ""];
+
+	let udpatedAds = await fetchData(
+		"http://localhost:8080/rent_web/AdDataOperationServelt.do",
+		dataToSend
+	);
+
+	tableInitial.clear().rows.add(udpatedAds).draw();
+
+}
+
 
 // 取得資料庫 data
 async function fetchData(url, dataToSend) {
@@ -403,7 +452,7 @@ async function displayAdDetails(ads, tableInitial, adId) {
 	let dataToSend = ["adDetails", adId];
 
 	let fetchedDetails = await fetchData(
-		"http://localhost:8080/rent_web/GetAdDataServlet.do",
+		"http://localhost:8080/rent_web/AdDataOperationServelt.do",
 		dataToSend
 	);
 
@@ -415,10 +464,7 @@ async function displayAdDetails(ads, tableInitial, adId) {
 	// debugging
 	console.log(ads);
 
-	if (fetchedDetails.length > 0) {
-		// debugging
-		console.log(fetchedDetails);
-
+	if (ads.length > 0) {
 		// 更新廣告詳細表格
 		let {
 			adId,
@@ -429,12 +475,13 @@ async function displayAdDetails(ads, tableInitial, adId) {
 			adDuration,
 			adPrice,
 			quantity,
+			subtotal,
 			createdAt,
 			isPaid,
 			orderId,
 			paidDate,
 			expiresAt,
-		} = fetchedDetails[0];
+		} = ads[0];
 
 		// 將資料更新到對應的 td
 		const adDetails = [
@@ -446,8 +493,7 @@ async function displayAdDetails(ads, tableInitial, adId) {
 			adDuration,
 			adPrice,
 			quantity,
-			parseInt(adPrice) * parseInt(quantity),
-			// 應該用db select再傳到前端，確保資料正確，以及用戶擅自修改
+			subtotal,
 			createdAt,
 			isPaid,
 			orderId,

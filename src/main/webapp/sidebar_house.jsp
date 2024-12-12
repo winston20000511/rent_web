@@ -19,6 +19,15 @@
 
 <link rel="stylesheet" type="text/css" href="CSS/backstage.css">
 <style>
+.btn-warning {
+    background-color: #ff9800; /* Custom orange color */
+    border-color: #ff9800; /* Match border color */
+}
+
+.btn-warning:hover {
+    background-color: #e68a00; /* Darker shade on hover */
+    border-color: #e68a00; /* Match border color */
+}
 body {
 	background-color: #f8f9fa; /* Light gray background */
 }
@@ -64,17 +73,20 @@ tr:hover td {
 </head>
 
 <body>
+		<%-- header --%>
 	<nav class="nav navbar navbar-expand-lg navbar-dark">
 		<div class="container-fluid">
 			<h1 class="navbar-brand">
-				<span>租屋網站後台管理</span>
+				<a class="navbar-brand" href="backstage-panel.jsp"><span>租屋網站後台管理</span></a>
 			</h1>
 			<div class="d-flex justify-content-end align-items-center">
-				<span id="timer" class="text-white me-3"></span> <span
-					class="navbar-text text-white me-3"> 歡迎, <span
-					id="adminName" class="admin-name" onclick="showSettings()">
-				</span>
-				</span> <a href="#" onclick="confirmLogout()" class="btn btn-outline-light">登出</a>
+				<div
+					class="d-flex justify-content-end align-items-center  navbar-text text-white me-3 ">
+					<span>歡迎,</span> <span class="admin-name" onclick="showSettings()">
+						<span id="adminName"></span> <span class="bi bi-pin-angle-fill"></span>
+					</span>
+				</div>
+				<a href="#" onclick="confirmLogout()" class="btn btn-outline-light">登出</a>
 			</div>
 		</div>
 	</nav>
@@ -82,40 +94,39 @@ tr:hover td {
 	<div class="containers">
 		<%-- Sidebar --%>
 		<div class="sidebar">
-
 			<ul>
-				<li><a class="bi bi-person-fill" href="sidebar_user.html"
+				<li><a class="bi bi-card-checklist" href="backstage-panel.jsp"
+					data-content="sidebar_backendData">首 頁<span
+						class="bi bi-caret-right-fill caret-icon"></span></a></li>
+				<li><a class="bi bi-person-fill" href="siderbar_user.jsp"
 					data-content="sidebar_member">會員管理系統<span
 						class="bi bi-caret-right-fill caret-icon"></span></a></li>
-				<li><a class="bi bi-house-door-fill" href="#"
+				<li><a class="bi bi-houses-fill" href="sidebar_house.jsp"
 					data-content="sidebar_house">房源管理系統<span
 						class="bi bi-caret-right-fill caret-icon"></span></a></li>
 				<li><a class="bi bi-calendar-check-fill"
 					href="sidebar_booking.jsp" data-content="sidebar_booking">預約管理系統<span
 						class="bi bi-caret-right-fill caret-icon"></span></a></li>
-				<li><a class="bi bi-headset" href="#"
-					data-content="sidebar_cusService">客服管理系統<span
+				<li><a class="bi bi-badge-ad" href="sidebar_adManage.jsp"
+					data-content="sidebar_adOrder">廣告管理系統<span
 						class="bi bi-caret-right-fill caret-icon"></span></a></li>
-				<li><a class="bi bi-chat-dots" href="#"
-					data-content="sidebar_chat">聊天管理系統<span
+				<li><a class="bi bi-wallet" href="sidebar_orderManage.jsp"
+					data-content="sidebar_settings">訂單管理系統<span
 						class="bi bi-caret-right-fill caret-icon"></span></a></li>
-				<li><a class="bi bi-receipt" href="#"
-					data-content="sidebar_adOrder">廣告訂單管理<span
+				<li><a class="bi bi-wallet" href="sidebar_complaints.jsp"
+					data-content="sidebar_settings">客訴管理系統<span
 						class="bi bi-caret-right-fill caret-icon"></span></a></li>
-				<li><a class="bi bi-card-checklist" href="#"
-					data-content="sidebar_backendData">後台數據<span
-						class="bi bi-caret-right-fill caret-icon"></span></a></li>
-				<li><a class="bi bi-gear" href="#"
-					data-content="sidebar_settings">設定<span
-						class="bi bi-caret-right-fill caret-icon"></span></a></li>
+
 			</ul>
 		</div>
+
+
 
 		<%-- Content --%>
 		<div class="content">
 			<div class="content">
 				<div class="Content">
-					<div class="container mt-4">
+					
 						<h1>房屋管理</h1>
 						<table class="table table-bordered" id="myTable">
 							<thead>
@@ -126,6 +137,7 @@ tr:hover td {
 									<th>屋主姓名</th>
 									<th>地址</th>
 									<th>價格</th>
+									<th>狀態</th>
 									<th>操作</th>
 								</tr>
 							</thead>
@@ -141,7 +153,6 @@ tr:hover td {
 				</div>
 			</div>
 		</div>
-	</div>
 
 	<%-- 管理者編輯<彈窗> --%>
 	<div id="settingsModal" class="modal">
@@ -186,225 +197,62 @@ tr:hover td {
 
 	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 	<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
-
+	<script src="JS/sidebar_house.js"></script>
+	<script src="JS/backstage.js"></script>
 	<script>
-		window.onload = function() {	
-			loadTable();
-			// 無法獲取session時登出
-        	var adminOnOff = "${sessionScope.admin != null ? sessionScope.admin : ''}";
-        	if (adminOnOff == "" || adminOnOff == null) {
-            	outPanel();
-        	}
-        	
-        
-        	// 資料更新確認
-            var updateConfirm = "${requestScope.updateConfirm}";
-			console.log("結果: "+updateConfirm);//判斷用可移除
-            if (updateConfirm !== "" && updateConfirm !== null) {
-            	if (updateConfirm === true || updateConfirm === "true") {
-                    document.getElementById("statusCell").innerText = "成功";
-                    document.getElementById("messageCell").innerText = "更新成功";
-                    document.getElementById("updateTable").classList.add('popup-success');	
-                    document.getElementById("settingsModalBackdrop").classList.add('show');	//添加遮罩
-                    
-                } else {
-                    document.getElementById("statusCell").innerText = "失敗";
-                    document.getElementById("messageCell").innerText = "更新失敗";
-                    document.getElementById("updateTable").classList.add('popup-error');	
-                    document.getElementById("settingsModal").classList.add('show');
-                    document.getElementById("settingsModalBackdrop").classList.add('show');	//添加遮罩
-                }
-                document.getElementById("updateTable").style.display = "block"; // 顯示表格
-            }
-            
-		}	
-        // 倒計時 10分鐘無反應登出
-        var logoutTimer;
-        resetTimer();
-	    document.onmousemove = resetTimer;
-		document.onkeydown = resetTimer;
-			
-			
-		// sidebar(側邊欄位)監聽器
-    	const links = document.querySelectorAll('.sidebar a');
-	
-	    links.forEach(link => {
-	        link.addEventListener('click', function (event) {
-	          
-	            links.forEach(l => {
-	                const icon = l.querySelector('.caret-icon');
-	                icon.classList.remove('active'); //顏色復原
-	            });
-	            const currentIcon = link.querySelector('.caret-icon');
-	            currentIcon.classList.add('active'); //更換顏色
-	            
-	        });
-	    });
-
-		// 讀取管理者(admin)資料 (****需改成SERVLET請求)
-		document.getElementById("adminData").innerHTML = `
-			<div class="mb-3">
-				<label for="adminNameInput" class="form-label">姓名</label>
-				<input type="text" id="adminNameInput" name="adminName" class="form-control" value="${sessionScope.admin.adminName}" required/>
-			</div>						
-			<div class="mb-3">
-				<label for="adminEmailInput" class="form-label">電子郵件</label>
-				<input type="email" id="adminEmailInput" name="adminEmail" class="form-control" value="${sessionScope.admin.adminEmail}" required/>
-			</div>
-			<div class="mb-3">
-				<label for="adminPasswordInput" class="form-label">密碼</label>
-				<input type="text" id="adminPasswordInput" name="adminPassword" class="form-control" value="${sessionScope.admin.adminPassword}" required/>
-			</div>
-			<div class="mb-3">
-				<label for="adminPhoneInput" class="form-label">電話</label>
-				<input type="text" id="adminPhoneInput" name="adminPhone" class="form-control" value="${sessionScope.admin.adminPhone}" required/>
-			</div>
-		`;
-
-		// 顯示管理員名稱
-		var adminName = "${sessionScope.admin != null ? sessionScope.admin.adminName : '管理員'}";
+$(function() {	
+    	
+    	var adminName = "${sessionScope.admin != null ? sessionScope.admin.adminName : '管理員'}";
 		document.getElementById("adminName").innerText = adminName;
-		
-		
-/* 下面放 function */
-		
-		// 管理員編輯<顯示彈窗>  
-			function showSettings() {
-	        	document.getElementById("settingsModal").classList.add('show');	//編輯的視窗
-	        	document.getElementById("settingsModalBackdrop").classList.add('show');	//遮罩
-	    	}
-		
-		// 管理員編輯<關閉彈窗> 
-			function closeSettings() {
-			document.getElementById("settingsModal").classList.remove('show');	//編輯的視窗
-			document.getElementById("settingsModalBackdrop").classList.remove('show');	//遮罩
-			}
-		
-		// 資料更新<關閉彈窗>
-		function closeTable() {
-	        document.getElementById("updateTable").style.display = "none";	// 更新的視窗
-	        document.getElementById("settingsModalBackdrop").classList.remove('show');	//遮罩
-	    }
-		
-		// 登出按鈕
-	    function confirmLogout() {
-	        // 彈出確認框，返回布林值
-	        const confirmation = confirm("你確定要登出嗎？");
-	        if (confirmation) {
-	            outPanel(); // 如果點擊「確定」，則執行登出操作
-	        }
-	    }
-	    document.addEventListener("DOMContentLoaded", function() {
-	        loadTable();
-	    });
-		// 倒計時<登出>
-	    function resetTimer() {
-			clearTimeout(logoutTimer);
-			logoutTimer = setTimeout(logout, 600000); // 毫秒(10分鐘)
-		}
-	    
-	    
-	    function logout() {
-			alert("您已經超過 10 分鐘未操作，將自動登出");
-			window.location.href = "LogoutServlet"; 
-		}
-	    
-	    function outPanel() {
-	    	window.location.href = "LogoutServlet"; 
-	    }
-	    function loadTable() {
-	        $.ajax({
-	            url: "http://localhost:8080/rent_web/houses.123", // API 端點
-	            type: "GET", // 使用 GET 方法
-	            dataType: "json", // 資料類型為 JSON
-	            success: function(data) {
-	                console.log("Data received:", data); // 確認數據是否正確
-	                
-	                // 清空表格內容
-	                $("#tableBody").empty();
-
-	                // 檢查是否有匹配的結果
-	                if (data.length === 0) {
-	                    $("#noMatch").show(); // 顯示未找到匹配結果的提示
-	                } else {
-	                    $("#noMatch").hide(); // 隱藏提示
-	                    
-	                    // 遍歷每筆房屋資料並添加到表格
-	                    $.each(data, function(index, house) {
-	                        $("#tableBody").append(
-	                        		'<tr>' +
-	                                '<td>' + house.houseId + '</td>' +
-	                                '<td>' + house.title + '</td>' +
-	                                '<td>' + house.userId + '</td>' +
-	                                '<td>' + house.userName + '</td>' +
-	                                '<td>' + house.address + '</td>' +
-	                                '<td>' + house.price + '</td>' +
-	                                '<td>' +
-	                                '<button class="btn btn-success" onclick="window.location.href=\'housePage.html?houseId=' + house.houseId + '\'">查看</button>' +
-	                                '<button class="btn btn-danger" onclick="confirmDelete(' + house.houseId + ')">刪除</button>' +
-	                                '</td>' +
-	                                '</tr>'
-	                        );
-	                    });
-	                }
-
-	                // 銷毀舊的 DataTable 實例（如果存在）
-	                if ($.fn.DataTable.isDataTable('#myTable')) {
-	                    $('#myTable').DataTable().destroy();
-	                }
-
-	                // 初始化 DataTable
-	                $("#myTable").DataTable({
-	                    language: {
-	                        url: "https://cdn.datatables.net/plug-ins/2.1.8/i18n/zh-HANT.json" // 使用繁體中文
-	                    },
-	                    autoWidth: true,
-	                    info:true,
-	                    processing: true, // 顯示資料加載中提示
-	                    stateSave: true, // 保存使用者狀態
-	                    lengthMenu: [10], // 每頁顯示 10 條數據
-	                    dom: '<f<t><ip>>', // 自訂 DOM 結構
-	                });
-	            },
-	            error: function(xhr, status, error) {
-	                console.error("AJAX Error: ", status, error); // 處理錯誤
-	            }
-	        });
-	    }
-
-
-	    function confirmDelete(houseId) {
-            console.log("Attempting to delete house with ID:", houseId); // Debugging log
-            if (typeof houseId === 'undefined' || houseId <= 0) {
-                console.error("Invalid house ID:", houseId);
-                alert("Invalid house ID.");
-                return;
-            }
-
-            if (confirm('確定要刪除這個房屋嗎？')) {
-                const xhr = new XMLHttpRequest();
-                xhr.open("POST", "/rent_web/housesDelete.123", true);
-                xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) {
-                        const messageDiv = document.getElementById("message");
-                        if (xhr.status === 200) {
-                            messageDiv.innerHTML = '房屋已成功刪除。';
-                            messageDiv.style.display = "block";
-                            loadTable(); // Refresh the table after deletion
-                        } else {
-                            console.error('Error:', xhr.status, xhr.responseText);
-                            messageDiv.innerHTML = '刪除失敗，請稍後再試。錯誤代碼：' + xhr.status + '，訊息：' + xhr.responseText;
-                            messageDiv.style.display = "block";
-                        }
-                    }
-                };
-
-                xhr.send(JSON.stringify({ id: houseId }));
-            }
-            
+    	
+        // 無法獲取session時登出
+        var adminOnOff = "${sessionScope.admin}";
+        if (adminOnOff == "" || adminOnOff == null) {
+            outPanel();
         }
+        
+        // 資料更新確認
+        var updateConfirm = "${requestScope.updateConfirm}";
+        if (updateConfirm !== "" && updateConfirm !== null) {
+            if (updateConfirm === "true") {
+                document.getElementById("statusCell").innerText = "成功";
+                document.getElementById("messageCell").innerText = "更新成功";
+                document.getElementById("updateTable").classList.add('popup-success');	
+                document.getElementById("settingsModalBackdrop").classList.add('show');	//添加遮罩
+                
+            } else {
+                document.getElementById("statusCell").innerText = "失敗";
+                document.getElementById("messageCell").innerText = "更新失敗";
+                document.getElementById("updateTable").classList.add('popup-error');	
+                document.getElementById("settingsModal").classList.add('show');
+                document.getElementById("settingsModalBackdrop").classList.add('show');	//添加遮罩
+            }
+            document.getElementById("updateTable").style.display = "block"; // 顯示表格
+        }
+        
+     
+        
+     // 讀取管理者(admin)資料 (****需改成SERVLET請求)
+        document.getElementById("adminData").innerHTML = `
+            <div class="mb-3">
+                <label for="adminNameInput" class="form-label">姓名</label>
+                <input type="text" id="adminNameInput" name="adminName" class="form-control" value="${sessionScope.admin.adminName}" autocomplete="off" required/>
+            </div>						
+            <div class="mb-3">
+                <label for="adminEmailInput" class="form-label">電子郵件</label>
+                <input type="email" id="adminEmailInput" name="adminEmail" class="form-control" value="${sessionScope.admin.adminEmail}" autocomplete="off" required/>
+            </div>
+            <div class="mb-3">
+                <label for="adminPasswordInput" class="form-label">密碼</label>
+                <input type="text" id="adminPasswordInput" name="adminPassword" class="form-control" value="${sessionScope.admin.adminPassword}" autocomplete="off" required/>
+            </div>
+            <div class="mb-3">
+                <label for="adminPhoneInput" class="form-label">電話</label>
+                <input type="text" id="adminPhoneInput" name="adminPhone" class="form-control" value="${sessionScope.admin.adminPhone}" autocomplete="off" required/>
+            </div>
+        `;
+    });	
+
 </script>
 </body>
 </html>

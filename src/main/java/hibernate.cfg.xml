@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+		<property name="hibernate.connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
+		<property name="hibernate.connection.password">!QAZ2wsx</property>
+		<property name="hibernate.connection.url">jdbc:sqlserver://localhost:1433;databaseName=RentDB;encrypt=true;trustServerCertificate=true</property>
+		<property name="hibernate.connection.username">sa</property>
+		<property name="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</property>
+		<property name="hibernate.show_sql">true</property>
+		<property name="hibernate.format_sql">true</property>
+		<property name="hibernate.current_session_context_class">thread</property>
+
+		<mapping class="Bean.OrderBean" />
+		<mapping class="Bean.AdBean" />
+		<mapping class="Bean.AdminBean" />
+		<mapping class="Bean.AdViewBean" />
+		<mapping class="Bean.BookingBean" />
+		<mapping class="Bean.BookingDetilBean" />
+		<mapping class="Bean.houseTableBean" />
+		<mapping class="Bean.UserBean" />
+		<mapping class="Bean.UserBean2" />
+		<mapping class="Bean.formComplationBean" />
+						
+		
+
+
+
+	</session-factory>
+</hibernate-configuration> 

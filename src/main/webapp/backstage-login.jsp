@@ -79,6 +79,17 @@ body {
 .visible {
 	visibility: visible;
 }
+
+.registeratag {
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
 </style>
 </head>
 
@@ -105,12 +116,22 @@ body {
 					<%= request.getAttribute("loginError") != null ? request.getAttribute("loginError") : "" %>
 				</p>
 				<button type="submit" class="btn btn-login">登入</button>
+			<a class="registeratag" href="http://localhost:8888/rent_web/backstage-register.jsp">註冊</a>
 			</form>
+			
+				
 			<div class="login-footer">
 				<div>租屋網站後台管理 &copy; 2024</div>
 			</div>
 		</div>
 	</div>
 
+<script>
+	document.addEventListener("click", () =>{
+		console.log("註冊按鈕被點擊！");
+		<!-- const atage= document.getElementById("registerButton").value; -->
+		
+	})
+</script>
 </body>
 </html>

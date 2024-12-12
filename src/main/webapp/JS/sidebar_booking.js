@@ -1,124 +1,155 @@
 $(document).ready(function() {
 	loadBookings(); // 頁面加載時自動加載預約數據
-
-	function loadBookings() {
-		$.ajax({
-			url: "BookingServlet?action=list", // 請求的 URL
-			type: "post",
-			dataType: "json",
-			success: function(data) {
-
-				$.each(data, function(index, booking) {
-					$("#tableBody").append(
-						`<tr>		
-							<td data-original-value="${booking.booking_id}">${booking.booking_id}</td>
-                            <td data-original-value="${booking.house_id}">${booking.house_id}</td>
-                            <td data-original-value="${booking.user_id}">${booking.user_id}</td>
-                            <td data-original-value="${booking.booking_date}">${booking.booking_date}</td>
-                            <td data-original-value="${booking.start_time}">${booking.start_time}</td>
-                            <td data-original-value="${booking.status}">${booking.status}</td>
-                            <td>
-								<button class="editBtn">編輯功能</button>
-				                <button class="updateBtn" style="display:none;">更新</button>
-				                <button class="cancelBtn" style="display:none;">取消</button>
-				                <button class="deleteBtn">刪除</button>
-                            </td>
-                        </tr>`
-					);
-				});
-				$("#myTable").DataTable({
-					language: {
-						url: "https://cdn.datatables.net/plug-ins/2.1.8/i18n/zh-HANT.json" // 使用繁體中文
-					},
-					processing: true,
-					stateSave: true,
-					lengthMenu: [10],
-					dom: '<f<t><ip>>',
-
-					columnDefs: [
-						{ orderable: false, targets: 6 } // 將第6列設置為沒有排列
-					]
-				}); // 初始化 DataTable
-			},
-			error: function(xhr, status, error) {
-				console.error("AJAX Error: ", status, error);
-			}
-		});
-	}
 });
 
-$(document).on('click', '.editBtn', function() {
-	const row = $(this).closest('tr');
-	$('#myTable tbody tr').not(row).find('.editBtn, .deleteBtn').prop('disabled', true);
-	row.find('td').each(function(index) {
-		if (index == 2 || index == 3 || index == 4 || index == 5) { // 不編輯操作列
-			const cell = $(this);
-			const currentValue = cell.text();
-			cell.html(`<input type="text" value="${currentValue}" />`);
+function loadBookings() {
+	// 檢查是否已經初始化過 DataTable
+	if ($.fn.DataTable.isDataTable('#myTable')) {
+		// 銷毀現有的 DataTable 實例
+		$('#myTable').DataTable().clear().destroy();
+	}
+
+	$.ajax({
+		url: 'BookingServlet?action=list', // 請求的 URL
+		type: 'post',
+		dataType: 'json',
+		success: function(data) {
+			// 清空表格
+			console.log(data);
+			const table = $("#myTable").DataTable({
+				language: {
+					url: "https://cdn.datatables.net/plug-ins/2.1.8/i18n/zh-HANT.json" // 使用繁體中文
+				},
+				processing: true,
+				dom: '<f><t><i><p>',	//l:length不使用;控制一次展示幾筆
+
+				columnDefs: [
+					{ orderable: false, targets: [4, 6] } // 取消排列,索引由0開始
+				]
+			});
+			table.clear(); // 清空現有數據
+
+			// 將新數據添加到表格中
+			$.each(data, function(index, booking) {
+				table.row.add([
+					`<td data-original-value="${booking.bookingId}">${booking.bookingId}</td>`,
+					`<td data-original-value="${booking.houseTitle}">${booking.houseTitle}</td>`,
+					`<td data-original-value="${booking.userName}">${booking.userName}</td>`,
+					`<td data-original-value="${booking.bookingDate}">${booking.bookingDate}</td>`,
+					`<td data-original-value="${booking.startTime}">${booking.startTime}</td>`,
+					`<td data-original-value="${booking.status}">${booking.status}</td>`,
+					`<td>
+	                       <button class="editBtn btn btn-warning">編輯功能</button>
+	                       <button class="updateBtn btn btn-outline-success" style="display:none;">更新</button>
+	                       <button class="cancelBtn btn btn-outline-secondary" style="display:none;">取消</button>
+					</td>`
+				]);
+
+			});
+		},
+		error: function(xhr, status, error) {
+			console.error("AJAX Error: ", status, error);
+			console.error("Response Text: ", xhr.responseText);
 		}
 	});
-	row.find('.editBtn, .deleteBtn').hide();
+}
+
+$(document).on('click', '.editBtn', function() {
+	const row = $(this).closest('tr');	//取得同一行
+
+	$('#myTable tbody tr').not(row).find('.editBtn').prop('disabled', true); //停用 編輯
+	$('#settingsModalBackdrop').addClass('show');
+	row.css({
+		'position': 'relative',
+		'z-index': 1500,
+		'background-color': 'white'
+	});
+
+	row.find('td').each(function(index) {
+		const cell = $(this);
+		const currentValue = cell.text();
+		cell.data('original-value', currentValue); // 儲存原始值
+
+		if (index == 5) {
+			cell.html(`		
+				<select class="form-select" aria-label="Default select example">
+				  <option value="open" ${currentValue === 'open' ? 'selected' : ''}>open</option>
+				  <option value="close" ${currentValue === 'close' ? 'selected' : ''}>close</option>
+				</select>`);
+		}
+
+	});
+	row.find('.editBtn').hide();
 	row.find('.updateBtn, .cancelBtn').show();
 });
 
+
 $(document).on('click', '.updateBtn', function() {
 	const row = $(this).closest('tr');
-	const updatedData = {};
-	let valid = true;
+	$('#settingsModalBackdrop').removeClass('show');
 
-	row.find('input').each(function(index) {
-		const inputValue = $(this).val();
-		if (inputValue.trim() === "") {
-			valid = false; // 確保不為空值
-		}
-		updatedData[`field${index}`] = inputValue; // 根據需要設定字段名
-	});
+	const Id = row.find('td').eq(0).text();
+	const newStatus = row.find('select').val();
 
-	if (valid) {
+	if (Id != null) {
 		// 發送 AJAX 請求更新資料庫
 		$.ajax({
-			url: 'UpdateBookingServlet', // 更新資料的 Servlet
+			url: 'BookingServlet?action=update', // 更新資料的 Servlet
 			type: 'POST',
-			data: updatedData,
+			data: {
+				bookingId: Id,
+				status: newStatus
+			},
 			success: function(response) {
-				// 更新成功後，重新加載數據或更新顯示
-				loadBookings(); // 重新加載預約數據
+				alert("更新成功");
+				loadBookings(); // 重新載入
+			},
+			error: function() {
+				alert("更新失敗");
 			}
 		});
 	} else {
-		alert("所有字段都必須填寫！");
+		alert("更新無效");
 	}
 });
 
+
 $(document).on('click', '.cancelBtn', function() {
 	const row = $(this).closest('tr');
-	$('#myTable tbody tr').find('.editBtn, .deleteBtn').prop('disabled', false);
+
+	$('#myTable tbody tr').find('.editBtn').prop('disabled', false); //啟用 編輯/刪除
+	$('#settingsModalBackdrop').removeClass('show');
+	row.css({
+		'position': '',
+		'z-index': '',
+		'background-color': ''
+	});
 	row.find('td').each(function(index) {
-		if (index !== 1 && index !== 6) { // 不編輯操作列
+		if (index < 6) {	// 恢復存儲的原始值
 			const cell = $(this);
-			const originalValue = cell.data('original-value'); // 假設之前存儲了原始值
+			const originalValue = cell.data('original-value');
 			cell.text(originalValue);
 		}
 	});
-	row.find('.editBtn, .deleteBtn').show();
+	row.find('.editBtn').show();
 	row.find('.updateBtn, .cancelBtn').hide();
 });
 
+
 $(document).on('click', '.deleteBtn', function() {
 	const row = $(this).closest('tr');
-	const bookingId = row.data('booking_id');
-	
-	console.log($(this).closest('tr'));
-	console.log($(this));
-	console.log("row: "+row);
-	console.log("ID: "+bookingId);
+	const bookingId = row.find('td').eq(0).text();	//
 	if (confirm("確定要刪除這筆資料嗎？")) {
 		$.ajax({
 			url: 'BookingServlet?action=delete', // 刪除資料的 Servlet
 			type: 'POST',
 			data: { id: bookingId },
 			success: function(response) {
-				loadBookings(); // 重新加載預約數據
+				alert("刪除成功");
+				loadBookings(); // 重新載入
+			},
+			error: function() {
+				alert("刪除失敗");
 			}
 		});
 	}
