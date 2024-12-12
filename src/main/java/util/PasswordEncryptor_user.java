@@ -13,12 +13,7 @@ public class PasswordEncryptor_user {
     public static void main(String[] args) {
         Transaction transaction = null;
 
-        /*
-         *  List<AdminBean> admins = session.createQuery("FROM AdminBean", AdminBean.class).getResultList();
-         *  ("FROM AdminBean", AdminBean.class) change to you wanna modify table 
-         *  
-         *   
-         * */
+ 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
 

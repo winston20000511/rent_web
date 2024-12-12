@@ -9,18 +9,12 @@
     <welcome-file>default.jsp</welcome-file>
     <welcome-file>default.htm</welcome-file>
   </welcome-file-list>
-  
-   <servlet>
-        <servlet-name>Servlet1</servlet-name>
-        <servlet-class>servlet.Servlet1</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>Servlet1</servlet-name>
-        <url-pattern>/path1</url-pattern>
-    </servlet-mapping>
-  
-  
-  
-  
-  
+  <servlet>
+    <servlet-name>Servlet1</servlet-name>
+    <servlet-class>servlet.Servlet1</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Servlet1</servlet-name>
+    <url-pattern>/path1</url-pattern>
+  </servlet-mapping>
 </web-app>
