@@ -35,17 +35,17 @@ public class LoadAllUsersServlet extends HttpServlet {
 			// 使用 HQL 查詢
 			session.beginTransaction();
 			Query<UserBean2> query = session.createQuery("FROM UserBean2 ORDER BY createtime DESC", UserBean2.class);
-			System.out.println(query);
+//			System.out.println(query);
 			users = query.getResultList();
 			// 將用戶資料轉換為 JSON 格式
-			System.out.println(users);
+//			System.out.println(users);
 		
 			
 			String json = new Gson().toJson(users);
 			
 			
 			response.getWriter().write(json);
-			System.out.println("json="+json);
+//			System.out.println("json="+json);
 			
 			session.getTransaction().commit();
 		} catch (Exception e) {
