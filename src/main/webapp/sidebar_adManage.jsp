@@ -156,29 +156,19 @@
 										<th>房屋編號</th>
 										<td class="house-id"></td>
 									</tr>
-									<tr>
-										<th>廣告類別</th>
-										<td class="ad-type"></td>
-									</tr>
-									<tr>
 										<th>廣告天期</th>
-										<td class="ad-duration"></td>
+										<td class="ad-type"></td>
 									</tr>
 									<tr>
 										<th>廣告單價</th>
 										<td class="ad-price"></td>
 									</tr>
 									<tr>
-										<th>數量</th>
-										<td class="ad-quantity"></td>
+										<th>折扣</th>
+										<td class="ad-coupon"></td>
 									</tr>
-									<tr>
 										<th>小計</th>
 										<td class="ad-price-subtotal"></td>
-									</tr>
-									<tr>
-										<th>新增／修改日期</th>
-										<td class="created-date"></td>
 									</tr>
 									<tr>
 										<th>付款狀態</th>

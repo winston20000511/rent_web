@@ -40,8 +40,8 @@ public class AdBeanDaoImpl implements AdBeanDao {
 
 	@Override
 	public List<AdBean> getAdBeansByUserId(Integer userId) {
-		Query<AdBean> query = session.createQuery("from AdBean where userId = :userId", AdBean.class);
-		query.setParameter("userid", userId);
+		Query<AdBean> query = session.createQuery("from AdBean a where a.user.userId = :userId", AdBean.class);
+		query.setParameter("userId", userId);
 		return query.getResultList();
 	}
 
