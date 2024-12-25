@@ -1,0 +1,15 @@
+@charset "UTF-8";
+#myTable th, #myTable td {
+    text-align: center; /* 水平居中 */
+    vertical-align: middle; /* 垂直居中 */
+}
+
+#myTable .btn{
+	margin-left: 20pX;
+}
+
+.dt-paging {
+    display: flex;
+    justify-content: center; /* 水平置中 */
+    
+}

@@ -1,0 +1,151 @@
+
+.select-box-label {
+	border-right: 3px solid #343a40;
+	margin: 0 5px 0 0;
+}
+
+.search-box {
+	border: 1px solid #343a40;
+	border-radius: 5px;
+	width: 600px;
+}
+
+#search-condition, #order-status {
+	border: none;
+	border-radius: 10px;
+	padding: 2px;
+	outline: none;
+}
+
+#search-inupt-box {
+	border: 0px;
+	outline: none;
+	text-align: center;
+	width: 300px;
+}
+
+button {
+	border-radius: 4.5px;
+	color: rgb(241, 241, 241);
+	background-color: #495057;
+	border: 1px solid #495057;
+}
+
+.btn:hover {
+	background-color: #495057;
+	color: rgb(241, 241, 241);
+}
+
+#search {
+	margin: 3px 5px 3px 0px;
+	border-radius: 4.5px;
+	color: rgb(241, 241, 241);
+	background-color: #343a40;
+	border: 1px solid #343a40;
+}
+
+.title-box {
+	border: 1px solid #343a40;
+	color: rgb(241, 241, 241);
+	background-color: #343a40;
+	text-align: center;
+	margin-top: 10px;
+}
+
+.dt-column-title {
+	font-size: 14px;
+}
+
+#ordertable th,
+#ordertable td {
+  text-align: left;
+  vertical-align: middle;
+}
+
+.details-btn {
+  color: rgb(73, 69, 54);
+  background-color: rgb(245, 221, 145);
+  border-radius: 3px;
+  border: 1px solid rgb(174, 153, 85);
+}
+
+.details-btn:hover {
+	background-color:rgb(174, 153, 85);
+	border: 1px solid rgb(174, 153, 85);
+	/* rgb(255, 186, 102);*/
+}
+
+/* order details - css*/
+.order-details-box{
+	margin-top: 8px;
+	border-top: 2px solid #343a40;
+	padding: 5px 0;
+   	display: none;
+}
+
+.order-details-box>h5 {
+	text-align: center;
+}
+
+#order-details, #ad-details {
+  border-collapse: collapse; /* 邊框合併 */
+  width: 100%; /* 根據需要設置寬度 */
+}
+
+#order-details th, #order-details td {
+  border: 1px solid rgb(57, 73, 79) ; /* 設置單元格邊框 */
+}
+
+#order-details th {
+  background-color: rgb(218, 218, 216); 
+  width: 20%;
+  height: 10px;
+  font-size: 15px;
+  text-align: center;
+}
+  
+#order-details td {
+  padding: 0 0 0 1%;
+  font-size: 15px;
+}
+
+.button-box{
+    width:100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.cancel-order{
+    margin: 0 0 0 30px;
+}
+
+.leave{
+    margin: 0 0 0 30px;
+}
+
+/* ad details */
+#ad-details {
+  text-align: center;
+  width: 100%;
+  border-collapse: collapse; /* 消除表格間的間隙 */
+}
+
+#ad-details th,
+#ad-details td {
+  border: 1px solid rgb(57, 73, 79) ;
+}
+
+.total-amount th,
+.total-amount td {
+  border: none !important; /* 移除總計行的邊框 */
+}
+
+.total-amount > th {
+  text-align: right;
+  padding: 1% 5.5% 1% 1%;
+}
+
+.total-amount > td {
+  text-align: center;
+  vertical-align: middle;
+}
