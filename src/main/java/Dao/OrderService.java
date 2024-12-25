@@ -16,12 +16,6 @@ import util.TimeForm;
 @SuppressWarnings("rawtypes")
 public class OrderService {
 
-	/*
-	 * 1. order data for datatable -> order data view only 
-	 * 2. order Details -> order + ads details
-	 * 3. cancel order
-	 */
-
 	private Logger logger = Logger.getLogger(OrderService.class.getName());
 	private OrderBeanDao orderBeanDao;
 
@@ -107,6 +101,11 @@ public class OrderService {
 		}
 	}
 
+	/**
+	 * 以訂單號碼取得訂單資料
+	 * @param receivedData
+	 * @return
+	 */
 	private List<Map> getOrdersByTradNo(List<String> receivedData) {
 		
 		logger.info("get orders by tradNo: " + receivedData);
@@ -122,6 +121,11 @@ public class OrderService {
 		}
 	}
 
+	/**
+	 * 以 user id 取的訂單資料
+	 * @param receivedData
+	 * @return
+	 */
 	private List<Map> getOrdersByUserId(List<String> receivedData) {
 		
 		logger.info("get orders by user id: " + receivedData);
@@ -138,7 +142,7 @@ public class OrderService {
 	}
 	
 	/**
-	 * 處理訂單詳細資料中的
+	 * 處理訂單詳細資料中的資料顯示內容
 	 * @param dataList
 	 */
 	private void reformedOrderDetails(List<Map> dataList) {
@@ -160,11 +164,14 @@ public class OrderService {
 		}
 	}
 
-	// set up order details
+	/**
+	 * 建立 order details 回傳資料
+	 * @param details
+	 * @return
+	 */
 	private Map<String, Object> setOrderDetails(List<Object[]> details) {
 
 		if (!details.isEmpty()) {
-			// set up order details
 			Map<String, Object> orderMap = new HashMap<>();
 			Object[] orderDetails = details.get(0);
 			orderMap.put("userId", orderDetails[0]);
@@ -178,7 +185,6 @@ public class OrderService {
 				orderMap.put("orderStatus", "一般訂單");
 			orderMap.put("totalAmount", orderDetails[5]);
 
-			// set up ad details
 			List<Map<String, Object>> adDataList = new ArrayList<>();
 			for (Object[] adDetails : details) {
 				Map<String, Object> adMap = new HashMap<>();
@@ -197,7 +203,7 @@ public class OrderService {
 			return orderMap;
 
 		} else {
-			System.out.println("No result was found for the provided tradNo.");
+			logger.info("找不到該筆訂單資料");
 		}
 
 		return null;

@@ -22,7 +22,7 @@ public interface AdBeanDao {
 	List<AdBean> getCanceledAdBeans();
 	
 	boolean updateAdBean(AdBean adBean);
-	AdBean updateAdBeanOnTypeAndQty(Integer adId, String adType, Integer Quantity);
+	AdBean updateAdBeanOnAdTypeAndPrice(Integer adid, Integer adtypeId);
 	
 	boolean deleteAdBeanByAdId(Integer adId);
 	

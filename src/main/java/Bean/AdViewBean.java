@@ -3,52 +3,50 @@ package Bean;
 import java.time.ZonedDateTime;
 import java.util.logging.Logger;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import util.TimeForm;
 
 @Data
 public class AdViewBean {
 	
-	private Logger logger = Logger.getLogger(AdViewBean.class.getName());
+	@JsonIgnore
+//	private Logger logger = Logger.getLogger(AdViewBean.class.getName());
 	
 	private Long adId;
 	private Long userId;
-	private Integer houseTitle;
-	private String adName;
+	private String userName;
+	private Long houseId;
+	private String adType;
 	private Integer adPrice;
 	private Integer subtotal;
 	private Boolean isCouponUsed;
 	private String isPaid;
 	private String orderId;
 	private String paidDate;
-	private String adDuration;
 
 	public AdViewBean() {
 		
 	}
 	
-	public AdViewBean(Long adId, Long userId, Integer houseTitle, String adName, String adDuration,
+	public AdViewBean(Long adId, Long userId, String userName, Long houseId, String adType,
 			Integer adPrice, Integer subtotal, String isPaid, String orderId, String paidDate) {
 		this.adId = adId;
 		this.userId = userId;
-		this.houseTitle = houseTitle;
-		this.adName = adName;
-		this.adDuration = adDuration;
+		this.userName = userName;
+		this.houseId = houseId;
+		this.adType = adType;
 		this.adPrice = adPrice;
 		this.subtotal = subtotal;
 		this.isPaid = isPaid;
 		this.orderId = orderId;
 		this.paidDate = paidDate;
 	}
-
-	public void setAdDuration(Integer adDuration) {
-		if(adDuration==30) this.adDuration = "30天";
-		else if(adDuration==60)this.adDuration = "60天";
-		logger.info("資料型別有誤");
-	}
 	
 	public void setPaidDate(ZonedDateTime paidDate) {
-		this.paidDate = TimeForm.convertZonedDateTimeToString(paidDate);
+		if(paidDate == null) this.paidDate = null;
+		else this.paidDate = TimeForm.convertZonedDateTimeToString(paidDate);
 	}
 
 	public void setIsPaid(Boolean isPaid) {

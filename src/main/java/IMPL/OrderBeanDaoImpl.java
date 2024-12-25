@@ -2,6 +2,7 @@ package IMPL;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -9,9 +10,9 @@ import org.hibernate.query.Query;
 import Bean.OrderBean;
 import Dao.OrderBeanDao;
 
-@SuppressWarnings("rawtypes")
 public class OrderBeanDaoImpl implements OrderBeanDao{
 	
+	private Logger logger = Logger.getLogger(OrderBeanDaoImpl.class.getName());
 	private Session session;
 	
 	public OrderBeanDaoImpl(Session session) {
@@ -22,6 +23,12 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 	@Override
 	public List<OrderBean> getAllOrderBeans() {
 		Query<OrderBean> orderBeans = session.createQuery("from OrderBean", OrderBean.class);
+		
+		List<OrderBean> orders = orderBeans.list();
+		for(OrderBean order : orders) {
+			logger.info("取得的order beans: " + order.getMerchantTradNo());
+		}
+		
 		return orderBeans.list();
 	}
 	
@@ -34,10 +41,21 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 
 	@Override
 	public List<Map> getOrderTableData() {
-		String hqlstr = "select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
-				+ "from OrderBean order by merchanttraddate";
-		Query<Map> query = session.createQuery(hqlstr, Map.class);
-		return query.list();
+		
+		try {
+			
+			String hqlstr = "select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
+					+ "from OrderBean order by merchanttraddate";
+			Query<Map> query = session.createQuery(hqlstr, Map.class);
+			return query.list();
+			
+		}catch(Exception exception) {
+			
+			exception.getStackTrace();
+			logger.severe("get order table data MAP 錯誤");
+		}
+		
+		return null;
 	}
 
 
@@ -46,9 +64,19 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 		String hqlstr = 
 				"select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
 				+ "from OrderBean where merchanttradno=:merchanttradno order by merchanttraddate";
-		Query<Map> query = session.createQuery(hqlstr, Map.class);
-		query.setParameter("merchanttradno", tradNo);
-		return query.list();
+		
+		try {
+			Query<Map> query = session.createQuery(hqlstr, Map.class);
+			query.setParameter("merchanttradno", tradNo);
+			return query.list();
+		} catch(Exception exception) {
+			
+			exception.getStackTrace();
+			logger.severe("get order table by tradNo MAP 錯誤");
+		}
+		
+		return null;
+		
 	}
 	
 	@Override
@@ -56,9 +84,19 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 		String hqlstr = 
 				"select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
 				+ "from OrderBean where userid=:userid order by merchanttraddate";
-		Query<Map> query = session.createQuery(hqlstr, Map.class);
-		query.setParameter("userid", userId);
-		return query.list();
+		
+		try {
+			Query<Map> query = session.createQuery(hqlstr, Map.class);
+			query.setParameter("userid", userId);
+			return query.list();
+			
+		} catch(Exception exception) {
+			
+			exception.getStackTrace();
+			logger.severe("get order table data by user id MAP 錯誤");
+		}
+		
+		return null;
 	}
 
 	@Override
@@ -66,9 +104,21 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 		String hqlstr = 
 				"select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
 				+ "from OrderBean where orderstatus=:orderstatus order by merchanttraddate";
-		Query<Map> query = session.createQuery(hqlstr, Map.class);
-		query.setParameter("orderstatus", orderStatus);
-		return query.list();
+		
+		try {
+			
+			Query<Map> query = session.createQuery(hqlstr, Map.class);
+			query.setParameter("orderstatus", orderStatus);
+			return query.list();
+			
+		} catch(Exception exception) {
+			
+			exception.getStackTrace();
+			logger.severe("get order table data by order status MAP 錯誤");
+		}
+		
+		return null;
+		
 	}
 
 	@Override
@@ -76,10 +126,21 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 		String hqlstr = 
 				"select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
 				+ "from OrderBean where merchanttradno=:merchanttradno and orderstatus=:orderstatus order by merchanttraddate";
-		Query<Map> query = session.createQuery(hqlstr, Map.class);		
-		query.setParameter("merchanttradno", tradNo);
-		query.setParameter("orderstatus", orderStatus);
-		return query.list();
+		
+		try {
+			
+			Query<Map> query = session.createQuery(hqlstr, Map.class);		
+			query.setParameter("merchanttradno", tradNo);
+			query.setParameter("orderstatus", orderStatus);
+			return query.list();
+			
+		} catch(Exception exception) {
+			exception.getStackTrace();
+			logger.severe("get order table data by order status MAP 錯誤");
+		}
+		
+		return null;
+		
 	}
 	
 	@Override
@@ -87,10 +148,20 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 		String hqlstr = 
 				"select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
 				+ "from OrderBean where userid=:userid and orderstatus=:orderstatus order by merchanttraddate";
-		Query<Map> query = session.createQuery(hqlstr, Map.class);		
-		query.setParameter("userid", userId);
-		query.setParameter("orderstatus", orderStatus);
-		return query.list();
+		
+		try {
+			
+			Query<Map> query = session.createQuery(hqlstr, Map.class);		
+			query.setParameter("userid", userId);
+			query.setParameter("orderstatus", orderStatus);
+			return query.list();
+			
+		} catch(Exception exception) {
+			exception.getStackTrace();
+			logger.severe("get order table data by user id and order status MAP 錯誤");
+		}
+		
+		return null;
 	}
 	
 	@Override
@@ -114,7 +185,7 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 	@Override
 	public OrderBean cancelOrderStatusByTradNo(String tradNo) {
 		OrderBean orderBean = getOrderBeanByTradNo(tradNo);
-		orderBean.setOrderstatus(0);
+		orderBean.setOrderStatus((short)0);
 		return orderBean;
 	}
 

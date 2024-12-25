@@ -7,6 +7,7 @@ import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.hibernate.Session;
 
@@ -27,6 +28,7 @@ import util.ZonedDateAdapter;
 @WebServlet("/OrderDataOperationServlet.do")
 public class OrderDataOperationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private Logger logger = Logger.getLogger(OrderDataOperationServlet.class.getName());
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		processAction(request, response);
@@ -58,7 +60,7 @@ public class OrderDataOperationServlet extends HttpServlet {
 			}
 			
 			// debugging
-			System.out.println("requestJson order update/cancel:" + requestJson.toString());
+			logger.info("requestJson order update/cancel:" + requestJson.toString());
 			
 			Gson gson = new GsonBuilder().registerTypeAdapter(ZonedDateTime.class, new ZonedDateAdapter()).create();
 			Type listType = new TypeToken<List<String>>() {}.getType();
@@ -69,6 +71,7 @@ public class OrderDataOperationServlet extends HttpServlet {
 			
 			switch(receivedData.get(0)) {
 				case "search":
+					logger.info("進入 search");
 					List<Map> filteredOrders = orderService.getFilteredOrders(receivedData);
 					jsonResponse = gson.toJson(filteredOrders); 
 					break;

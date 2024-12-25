@@ -1,10 +1,10 @@
 package Bean;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,10 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -58,9 +56,12 @@ public class OrderBean {
 //	@JsonIgnore
 //	private UserTableBean user;
 	
-	@OneToMany(mappedBy="order", fetch = FetchType.LAZY)
-	@JsonIgnore
-	private List<AdBean> ads;
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="order", cascade = CascadeType.ALL)
+	private List<AdBean> ads = new ArrayList<AdBean>();
+
+	public OrderBean() {
+	}
+	
 	
 }
 

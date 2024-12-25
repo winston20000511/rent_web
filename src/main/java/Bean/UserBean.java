@@ -45,6 +45,10 @@ public class UserBean {
 	@Exclude
 	private List<houseTableBean> houses = new ArrayList<houseTableBean>();
 	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+	@JsonInclude(JsonInclude.Include.NON_EMPTY) 
+	@Exclude
+	private List<AdBean> ads = new ArrayList<AdBean>();
 
 	// Constructor
 	public UserBean(Integer userId, String name, String email, String password, String phone, byte[] picture,

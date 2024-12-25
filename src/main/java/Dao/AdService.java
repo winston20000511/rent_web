@@ -28,7 +28,7 @@ public class AdService {
 	 */
 	public List<AdViewBean> getFilteredAds(List<String> receivedData) {
 		
-		logger.info(receivedData.toString());
+//		logger.info("get filtered ads: " + receivedData.toString());
 		
 		List<AdBean> adBeanList = new ArrayList<AdBean>();
 
@@ -118,9 +118,8 @@ public class AdService {
 		logger.info(receivedData.toString());
 		
 		String adType = (receivedData.get(2).equals("a")) ? "A廣告" : "B廣告"; // 可能要跟前端溝通名稱
-		adBeanDao.updateAdBeanOnTypeAndQty(
-				Integer.parseInt(receivedData.get(1)), adType,
-				Integer.parseInt(receivedData.get(3)));
+		adBeanDao.updateAdBeanOnAdTypeAndPrice(
+				Integer.parseInt(receivedData.get(1)), Integer.parseInt(receivedData.get(3))); // 要傳 adId 跟 adtypeId
 		AdBean adBean = adBeanDao.getAdBeanByAdId(Integer.parseInt(receivedData.get(1)));
 		return setAdView(adBean);
 	}
@@ -144,10 +143,11 @@ public class AdService {
 	private AdViewBean setAdView(AdBean adBean) {
 		AdViewBean adView = new AdViewBean();
 		adView.setAdId(adBean.getAdId());
-		adView.setUserId(adBean.getUserId());
-//		adView.setHouseTitle(adBean.getHouse().getHouseId());
-		adView.setAdName(adBean.getAdtype().getAdName());
-//		adView.setAdDuration(null);
+//		adView.setUserId(adBean.getUserId());
+		adView.setUserId((long)(adBean.getUser().getUserId()));
+		adView.setUserName(adBean.getUser().getName());
+		adView.setHouseId(adBean.getHouseId());
+		adView.setAdType(adBean.getAdtype().getAdName());
 		adView.setAdPrice(adBean.getAdPrice());
 //		adView.setSubtotal(null);
 		adView.setIsPaid(adBean.getIsPaid());
