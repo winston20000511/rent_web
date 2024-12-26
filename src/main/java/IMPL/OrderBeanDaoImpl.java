@@ -1,7 +1,6 @@
 package IMPL;
 
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import org.hibernate.Session;
@@ -9,6 +8,7 @@ import org.hibernate.query.Query;
 
 import Bean.OrderBean;
 import Dao.OrderBeanDao;
+import dto.OrderDetailsDTO;
 
 public class OrderBeanDaoImpl implements OrderBeanDao{
 	
@@ -40,132 +40,100 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 	}
 
 	@Override
-	public List<Map> getOrderTableData() {
+	public List<OrderDetailsDTO> getOrderTableData() {
 		
-		try {
-			
-			String hqlstr = "select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
-					+ "from OrderBean order by merchanttraddate";
-			Query<Map> query = session.createQuery(hqlstr, Map.class);
-			return query.list();
-			
-		}catch(Exception exception) {
-			
-			exception.getStackTrace();
-			logger.severe("get order table data MAP 錯誤");
-		}
-		
-		return null;
+		String hqlstr = "select userId, merchantTradNo, merchantTradDate, orderStatus from OrderBean";
+		Query<OrderDetailsDTO> query = session.createQuery(hqlstr);
+		return query.list();
 	}
 
 
 	@Override
-	public List<Map> getOrderTableDataByTradNo(String tradNo) {
+	public List<OrderDetailsDTO> getOrderTableDataByTradNo(String tradNo) {
 		String hqlstr = 
 				"select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
 				+ "from OrderBean where merchanttradno=:merchanttradno order by merchanttraddate";
 		
-		try {
-			Query<Map> query = session.createQuery(hqlstr, Map.class);
-			query.setParameter("merchanttradno", tradNo);
-			return query.list();
-		} catch(Exception exception) {
-			
-			exception.getStackTrace();
-			logger.severe("get order table by tradNo MAP 錯誤");
-		}
+		Query<OrderDetailsDTO> query = session.createQuery(hqlstr, OrderDetailsDTO.class);
+		query.setParameter("merchantTradNo", tradNo);
 		
-		return null;
-		
+		return query.list();
 	}
 	
 	@Override
-	public List<Map> getOrderTableDataByUserId(Integer userId) {
-		String hqlstr = 
-				"select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
-				+ "from OrderBean where userid=:userid order by merchanttraddate";
-		
-		try {
-			Query<Map> query = session.createQuery(hqlstr, Map.class);
-			query.setParameter("userid", userId);
-			return query.list();
-			
-		} catch(Exception exception) {
-			
-			exception.getStackTrace();
-			logger.severe("get order table data by user id MAP 錯誤");
-		}
-		
-		return null;
+	public List<OrderDetailsDTO> getOrderTableDataByUserId(Integer userId) {
+	    String hqlstr = 
+	        "select o.userId, o.merchantTradNo, o.merchantTradDate, o.orderStatus "
+	        + "from OrderBean o where o.userId = :userId order by o.merchantTradDate";
+	    
+	    Query<OrderDetailsDTO> query = session.createQuery(hqlstr, OrderDetailsDTO.class);
+	    query.setParameter("userId", userId);
+	    
+	    return query.list();
+	}
+
+	// 用 DTO 接
+	@Override
+	public List<OrderDetailsDTO> getOrderTableDataByOrderStatus(Short orderStatus) {
+	    String hqlstr = 
+	        "select o.userId, o.merchantTradNo, o.merchantTradDate, o.orderStatus "
+	        + "from OrderBean o where o.orderStatus = :orderStatus order by o.merchantTradDate";
+	    
+	    try {
+	        Query<OrderDetailsDTO> query = session.createQuery(hqlstr, OrderDetailsDTO.class);
+	        query.setParameter("orderStatus", orderStatus);
+	        return query.list();
+	    } catch (Exception exception) {
+	        exception.printStackTrace();
+	        logger.severe("get order table data by order status error");
+	    }
+	    
+	    return null;
 	}
 
 	@Override
-	public List<Map> getOrderTableDataByOrderStatus(Integer orderStatus){
-		String hqlstr = 
-				"select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
-				+ "from OrderBean where orderstatus=:orderstatus order by merchanttraddate";
-		
-		try {
-			
-			Query<Map> query = session.createQuery(hqlstr, Map.class);
-			query.setParameter("orderstatus", orderStatus);
-			return query.list();
-			
-		} catch(Exception exception) {
-			
-			exception.getStackTrace();
-			logger.severe("get order table data by order status MAP 錯誤");
-		}
-		
-		return null;
-		
+	public List<OrderDetailsDTO> getOrderTableDataByTradNoAndOrderStatus(String tradNo, Integer orderStatus) {
+	    String hqlstr = 
+	            "select o.userId, o.merchantTradNo, o.merchantTradDate, o.orderStatus "
+	            + "from OrderBean o where o.merchantTradNo = :merchantTradNo and o.orderStatus = :orderStatus "
+	            + "order by o.merchantTradDate";
+	    
+	    try {
+	        Query<OrderDetailsDTO> query = session.createQuery(hqlstr, OrderDetailsDTO.class);
+	        query.setParameter("merchantTradNo", tradNo);
+	        query.setParameter("orderStatus", orderStatus);
+	        return query.list();
+	    } catch (Exception exception) {
+	        exception.printStackTrace();
+	        logger.severe("get order table data by order status error");
+	    }
+	    
+	    return null;
 	}
 
 	@Override
-	public List<Map> getOrderTableDataByTradNoAndOrderStatus(String tradNo, Integer orderStatus){
-		String hqlstr = 
-				"select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
-				+ "from OrderBean where merchanttradno=:merchanttradno and orderstatus=:orderstatus order by merchanttraddate";
-		
-		try {
-			
-			Query<Map> query = session.createQuery(hqlstr, Map.class);		
-			query.setParameter("merchanttradno", tradNo);
-			query.setParameter("orderstatus", orderStatus);
-			return query.list();
-			
-		} catch(Exception exception) {
-			exception.getStackTrace();
-			logger.severe("get order table data by order status MAP 錯誤");
-		}
-		
-		return null;
-		
+	public List<OrderDetailsDTO> getOrderTableDataByUserIdAndOrderStatus(Integer userId, Integer orderStatus) {
+	    String hqlstr = 
+	            "select o.userId, o.merchantTradNo, o.merchantTradDate, o.orderStatus "
+	            + "from OrderBean o where o.userId = :userId and o.orderStatus = :orderStatus "
+	            + "order by o.merchantTradDate";
+	    
+	    try {
+	        Query<OrderDetailsDTO> query = session.createQuery(hqlstr, OrderDetailsDTO.class);
+	        query.setParameter("userId", userId);
+	        query.setParameter("orderStatus", orderStatus);
+	        return query.list();
+	    } catch (Exception exception) {
+	        exception.printStackTrace();
+	        logger.severe("get order table data by user id and order status error");
+	    }
+	    
+	    return null;
 	}
+
 	
 	@Override
-	public List<Map> getOrderTableDataByUserIdAndOrderStatus(Integer userId, Integer orderStatus){
-		String hqlstr = 
-				"select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
-				+ "from OrderBean where userid=:userid and orderstatus=:orderstatus order by merchanttraddate";
-		
-		try {
-			
-			Query<Map> query = session.createQuery(hqlstr, Map.class);		
-			query.setParameter("userid", userId);
-			query.setParameter("orderstatus", orderStatus);
-			return query.list();
-			
-		} catch(Exception exception) {
-			exception.getStackTrace();
-			logger.severe("get order table data by user id and order status MAP 錯誤");
-		}
-		
-		return null;
-	}
-	
-	@Override
-	public List<Object[]> getOrderAdCombinedDataByTradNo(String tradNo){
+	public OrderDetailsDTO getOrderAdCombinedDataByTradNo(String tradNo){
 	    String hqlstr = "select o.userid, o.merchanttradno, o.merchanttraddate, "
                 + "o.choosepayment, o.orderstatus, o.totalamount, "
                 + "a.username, a.houseid, a.adid, a.adtype, "
@@ -173,12 +141,10 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
                 + "from OrderBean o join o.ads a "
                 + "where o.merchanttradno = :merchanttradno";
 	    
-	    Query<Object[]> query = session.createQuery(hqlstr, Object[].class);
+	    Query<OrderDetailsDTO> query = session.createQuery(hqlstr, OrderDetailsDTO.class);
 	    query.setParameter("merchanttradno", tradNo);
 
-	    List<Object[]> results = query.list();
-	    
-	    return results;
+	    return query.getSingleResult();
 	}
 
 

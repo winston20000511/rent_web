@@ -16,6 +16,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import Dao.OrderService;
+import dto.OrderDetailsDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -24,7 +25,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import util.HibernateUtil;
 import util.ZonedDateAdapter;
 
-@SuppressWarnings("rawtypes")
 @WebServlet("/OrderDataOperationServlet.do")
 public class OrderDataOperationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -72,12 +72,12 @@ public class OrderDataOperationServlet extends HttpServlet {
 			switch(receivedData.get(0)) {
 				case "search":
 					logger.info("進入 search");
-					List<Map> filteredOrders = orderService.getFilteredOrders(receivedData);
+					List<OrderDetailsDTO> filteredOrders = orderService.getFilteredOrders(receivedData);
 					jsonResponse = gson.toJson(filteredOrders); 
 					break;
 					
 				case "orderDetails":
-					Map<String, Object> orderDetails = orderService.getOrderDetailsByTradNo(receivedData);
+					OrderDetailsDTO orderDetails = orderService.getOrderDetailsByTradNo(receivedData);
 				    jsonResponse = gson.toJson(orderDetails);
 					break;
 				
