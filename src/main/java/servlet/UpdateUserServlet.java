@@ -10,7 +10,7 @@ import org.hibernate.Transaction;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import Bean.UserBean;
+import Bean.UserTableBean;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -53,15 +53,15 @@ public class UpdateUserServlet extends HttpServlet {
             transaction = session.beginTransaction();
             System.out.println("transaction:" + transaction);
             
-            UserBean user = session.get(UserBean.class, userId); // 根據 userId 獲取用戶實體
+            UserTableBean user = session.get(UserTableBean.class, userId); // 根據 userId 獲取用戶實體
 
             if (user != null) {
                 user.setName(name);
                 user.setEmail(email);
                 user.setPassword(password);
                 user.setPhone(phone);
-                user.setGender(gender);
-                user.setStatus(status);
+//                user.setGender(gender);
+//                user.setStatus(status);
                 session.update(user); // 更新用戶資料
 
                 transaction.commit();

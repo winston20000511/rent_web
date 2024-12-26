@@ -2,6 +2,9 @@ package Bean;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +15,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "booking_table")
 public class BookingBean {
@@ -42,86 +50,12 @@ public class BookingBean {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "house_id")
-	private houseTableBean houseBean;
+	private HouseTableBean houseBean;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_id")
-	private UserBean userBean;
+	private UserTableBean userBean;
 
-	public BookingBean() {
 
-	}
-
-	public Long getBookingId() {
-		return bookingId;
-	}
-
-	public void setBookingId(Long bookingId) {
-		this.bookingId = bookingId;
-	}
-
-	public Long getHouseId() {
-		return houseId;
-	}
-
-	public void setHouseId(Long houseId) {
-		this.houseId = houseId;
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-
-	public Date getBookingDate() {
-		return bookingDate;
-	}
-
-	public void setBookingDate(Date bookingDate) {
-		this.bookingDate = bookingDate;
-	}
-
-	public Time getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(Time startTime) {
-		this.startTime = startTime;
-	}
-
-	public Time getEndTime() {
-		return endTime;
-	}
-
-	public void setEndTime(Time endTime) {
-		this.endTime = endTime;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public houseTableBean getHouseBean() {
-		return houseBean;
-	}
-
-	public void setHouseBean(houseTableBean houseBean) {
-		this.houseBean = houseBean;
-	}
-
-	public UserBean getUserBean() {
-		return userBean;
-	}
-
-	public void setUserBean(UserBean userBean) {
-		this.userBean = userBean;
-	}
 
 }
