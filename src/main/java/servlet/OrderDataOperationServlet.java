@@ -7,6 +7,7 @@ import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.hibernate.Session;
 
@@ -15,6 +16,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import Dao.OrderService;
+import dto.OrderDetailsDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -23,10 +25,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import util.HibernateUtil;
 import util.ZonedDateAdapter;
 
-@SuppressWarnings("rawtypes")
 @WebServlet("/OrderDataOperationServlet.do")
 public class OrderDataOperationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private Logger logger = Logger.getLogger(OrderDataOperationServlet.class.getName());
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		processAction(request, response);
@@ -58,7 +60,7 @@ public class OrderDataOperationServlet extends HttpServlet {
 			}
 			
 			// debugging
-			System.out.println("requestJson order update/cancel:" + requestJson.toString());
+			logger.info("requestJson order update/cancel:" + requestJson.toString());
 			
 			Gson gson = new GsonBuilder().registerTypeAdapter(ZonedDateTime.class, new ZonedDateAdapter()).create();
 			Type listType = new TypeToken<List<String>>() {}.getType();
@@ -69,12 +71,13 @@ public class OrderDataOperationServlet extends HttpServlet {
 			
 			switch(receivedData.get(0)) {
 				case "search":
-					List<Map> filteredOrders = orderService.getFilteredOrders(receivedData);
+					logger.info("進入 search");
+					List<OrderDetailsDTO> filteredOrders = orderService.getFilteredOrders(receivedData);
 					jsonResponse = gson.toJson(filteredOrders); 
 					break;
 					
 				case "orderDetails":
-					Map<String, Object> orderDetails = orderService.getOrderDetailsByTradNo(receivedData);
+					OrderDetailsDTO orderDetails = orderService.getOrderDetailsByTradNo(receivedData);
 				    jsonResponse = gson.toJson(orderDetails);
 					break;
 				

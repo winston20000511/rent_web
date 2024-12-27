@@ -1,8 +1,5 @@
 package IMPL;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -10,7 +7,6 @@ import org.hibernate.query.Query;
 
 import Bean.AdBean;
 import Dao.AdBeanDao;
-import util.HibernateUtil;
 
 public class AdBeanDaoImpl implements AdBeanDao {
 
@@ -20,7 +16,6 @@ public class AdBeanDaoImpl implements AdBeanDao {
 		this.session = session;
 	}
 
-	// 使用 HQL 的 create 方法
 	@Override
 	public boolean createAdBean(AdBean adBean) {
 		try {
@@ -39,21 +34,21 @@ public class AdBeanDaoImpl implements AdBeanDao {
 	}
 
 	@Override
-	public AdBean getAdBeanByAdId(Integer adid) {
-		return session.get(AdBean.class, adid);
+	public AdBean getAdBeanByAdId(Integer adId) {
+		return session.get(AdBean.class, adId);
 	}
 
 	@Override
-	public List<AdBean> getAdBeansByUserId(Integer userid) {
-		Query<AdBean> query = session.createQuery("from AdBean where userid = :userid", AdBean.class);
-		query.setParameter("userid", userid);
+	public List<AdBean> getAdBeansByUserId(Integer userId) {
+		Query<AdBean> query = session.createQuery("from AdBean a where a.user.userId = :userId", AdBean.class);
+		query.setParameter("userId", userId);
 		return query.getResultList();
 	}
 
 	@Override
-	public List<AdBean> getAdBeansByHouseId(Integer houseid) {
-		Query<AdBean> query = session.createQuery("from AdBean where houseid = :houseid", AdBean.class);
-		query.setParameter("houseid", houseid);
+	public List<AdBean> getAdBeansByHouseId(Integer houseId) {
+		Query<AdBean> query = session.createQuery("from AdBean where houseId = :houseId", AdBean.class);
+		query.setParameter("houseId", houseId);
 		return query.getResultList();
 	}
 
@@ -113,16 +108,11 @@ public class AdBeanDaoImpl implements AdBeanDao {
 	}
 
 	@Override
-	public AdBean updateAdBeanOnTypeAndQty(Integer adid, String adtype, Integer quantity) {
-		Integer adduration = adtype.equals("A廣告") ? 30 : 60;
-		Integer adprice = adtype.equals("A廣告") ? 10000 : 20000;
-
+	public AdBean updateAdBeanOnAdTypeAndPrice(Integer adid, Integer adtypeId) {
 		AdBean adBean = getAdBeanByAdId(adid);
-		adBean.setAdtype(adtype);
-		adBean.setAdduration(adduration);
-		adBean.setAdprice(adprice);
-		adBean.setQuantity(quantity);
-		adBean.setCreatedat(ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("Asia/Taipei")));
+		adBean.setAdPrice(adtypeId);
+//		adBean.setAdtypeId(null);
+//		adBean.setAdtype(null);
 
 		return adBean;
 	}

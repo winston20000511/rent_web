@@ -46,7 +46,7 @@ public class BookingBean {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_id")
-	private UserTableBean userTableBean;
+	private UserBean userBean;
 
 	public BookingBean() {
 
@@ -116,12 +116,12 @@ public class BookingBean {
 		this.houseBean = houseBean;
 	}
 
-	public UserTableBean getUserBean() {
-		return userTableBean;
+	public UserBean getUserBean() {
+		return userBean;
 	}
 
-	public void setUserBean(UserTableBean userTableBean) {
-		this.userTableBean = userTableBean;
+	public void setUserBean(UserBean userBean) {
+		this.userBean = userBean;
 	}
 
 }

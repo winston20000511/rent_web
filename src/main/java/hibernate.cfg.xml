@@ -15,6 +15,7 @@
 
 		<mapping class="Bean.OrderBean" />
 		<mapping class="Bean.AdBean" />
+		<mapping class="Bean.AdtypeBean" />
 		<mapping class="Bean.AdminBean" />
 		<mapping class="Bean.AdViewBean" />
 		<mapping class="Bean.BookingBean" />

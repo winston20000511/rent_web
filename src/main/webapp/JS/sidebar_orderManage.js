@@ -62,7 +62,7 @@ $(document).ready(function() {
 		// 0. 顯示所有訂單
 		orders = await displayData({ orders, tableInitial, searchParams: {} });
 		// debugging
-		console.log(orders);
+		console.log("顯示所有訂單的: ", orders);
 
 		// 1. 搜尋：傳送選取條件
 		searchBtn.addEventListener("click", function() {
