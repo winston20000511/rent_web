@@ -1,0 +1,48 @@
+.btn-warning {
+    background-color: #ff9800;
+    border-color: #ff9800;
+}
+
+.btn-warning:hover {
+    background-color: #e68a00;
+    border-color: #e68a00;
+}
+
+body {
+    background-color: #f8f9fa;
+}
+
+h1 {
+    color: #343a40;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    background-color: #ffffff;
+}
+
+th {
+    background-color: #6c757d;
+    color: white;
+}
+
+td {
+    background-color: #e9ecef;
+    color: #212529;
+}
+
+tr:hover td {
+    background-color: #ced4da;
+}
+
+.boolean-icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background-size: cover;
+}
+
+.boolean-false {
+    background-color: red;
+}

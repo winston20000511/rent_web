@@ -1,16 +1,25 @@
 package Bean;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import util.Exclude;
 
 @Entity
 @Table(name = "user_table")
-public class UserBean2 {
+public class UserTableBean {
 
 	@Id
 	@Column(name = "user_id")
@@ -20,16 +29,26 @@ public class UserBean2 {
 	private String email;
 	private String password;
 	private String phone;
-	private String picture;
+	private byte[] picture;
 	private Timestamp createtime;
 	private Integer gender;
-	private String status;
+	private Integer status;
 
-
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userBean", cascade = CascadeType.ALL)
+	@JsonInclude(JsonInclude.Include.NON_EMPTY) 
+	@Exclude
+	private List<BookingBean> bookings = new ArrayList<BookingBean>();
+	
+	//weirong
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userBean", cascade = CascadeType.ALL)
+	@JsonInclude(JsonInclude.Include.NON_EMPTY) 
+	@Exclude
+	private List<houseTableBean> houses = new ArrayList<houseTableBean>();
+	
 
 	// Constructor
-	public UserBean2(Integer userId, String name, String email, String password, String phone, String picture,
-			Timestamp createtime, Integer gender, String status) {
+	public UserTableBean(Integer userId, String name, String email, String password, String phone, byte[] picture,
+			Timestamp createtime, Integer gender, Integer status) {
 		this.userId = userId;
 		this.name = name;
 		this.email = email;
@@ -41,7 +60,7 @@ public class UserBean2 {
 		this.status = status;
 	}
 
-	public UserBean2() {
+	public UserTableBean() {
 	}
 
 	// Getters and Setters
@@ -85,11 +104,11 @@ public class UserBean2 {
 		this.phone = phone;
 	}
 
-	public String getPicture() {
+	public byte[] getPicture() {
 		return picture;
 	}
 
-	public void setPicture(String picture) {
+	public void setPicture(byte[] picture) {
 		this.picture = picture;
 	}
 
@@ -109,11 +128,11 @@ public class UserBean2 {
 		this.gender = gender;
 	}
 
-	public String getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(Integer status) {
 		this.status = status;
 	}
 
