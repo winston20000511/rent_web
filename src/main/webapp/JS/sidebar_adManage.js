@@ -50,7 +50,6 @@ $(document).ready(function() {
 				{ title: "用戶姓名", data: "userName" },
 				{ title: "房屋編號", data: "houseId" },
 				{ title: "廣告類別", data: "adType" },
-				{ title: "廣告數量", data: "quantity" },
 				{ title: "付款狀態", data: "isPaid" },
 				{
 					title: "操作功能",
@@ -120,7 +119,7 @@ async function displayData({ ads, tableInitial, searchParams }) {
 	];
 
 	// debugging
-	console.log("display all data to sedn: " + dataToSend);
+	console.log("display all data to send: " + dataToSend);
 
 	try {
 		let fetchedAds = await fetchData(
@@ -432,15 +431,13 @@ async function displayAdDetails(ads, tableInitial, adId) {
 		"user-name",
 		"house-id",
 		"ad-type",
-		"ad-duration",
 		"ad-price",
-		"ad-quantity",
+		"ad-coupon",
 		"ad-price-subtotal",
-		"created-date",
 		"is-paid",
 		"order-id",
 		"paid-date",
-		"expires-at",
+		"expires-at"
 	];
 
 	let tds = classNames.map((className) => {
@@ -448,7 +445,6 @@ async function displayAdDetails(ads, tableInitial, adId) {
 	});
 
 	// debugging
-	console.log(adId);
 	let dataToSend = ["adDetails", adId];
 
 	let fetchedDetails = await fetchData(
@@ -466,44 +462,25 @@ async function displayAdDetails(ads, tableInitial, adId) {
 
 	if (ads.length > 0) {
 		// 更新廣告詳細表格
-		let {
-			adId,
-			userId,
-			userName,
-			houseId,
-			adType,
-			adDuration,
-			adPrice,
-			quantity,
-			subtotal,
-			createdAt,
-			isPaid,
-			orderId,
-			paidDate,
-			expiresAt,
-		} = ads[0];
-
-		// 將資料更新到對應的 td
-		const adDetails = [
-			adId,
-			userId,
-			userName,
-			houseId,
-			adType,
-			adDuration,
-			adPrice,
-			quantity,
-			subtotal,
-			createdAt,
-			isPaid,
-			orderId,
-			paidDate,
-			expiresAt,
-		];
-
-		tds.forEach((tdList, index) => {
-			tdList.forEach((td) => (td.textContent = adDetails[index]));
-		});
+		let adDetails = {
+			"ad-id": ads[0].adId,
+			"user-id": ads[0].userId,
+			"user-name": ads[0].userName,
+			"house-id": ads[0].houseId,
+			"ad-type": ads[0].adType,
+			"ad-price": ads[0].adPrice,
+			"ad-price-subtotal": "待更新",
+			"ad-coupon" : "待更新",
+			"is-paid": ads[0].isPaid,
+			"order-id": ads[0].orderId,
+			"paid-date": ads[0].paidDate,
+			"expires-at": "待更新"
+		  };
+		  
+		  Object.keys(adDetails).forEach((className) => {
+			let elements = document.querySelectorAll(`.${className}`);
+			elements.forEach((td) => (td.textContent = adDetails[className]));
+		  });
 
 		return ads;
 	}

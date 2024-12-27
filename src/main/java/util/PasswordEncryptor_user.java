@@ -7,7 +7,7 @@ import org.hibernate.Transaction;
 import org.mindrot.jbcrypt.BCrypt;
 
 import Bean.AdminBean;
-import Bean.UserBean;
+import Bean.UserTableBean;
 
 public class PasswordEncryptor_user {
     public static void main(String[] args) {
@@ -17,8 +17,8 @@ public class PasswordEncryptor_user {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
-            List<UserBean> users = session.createQuery("FROM user_table", UserBean.class).getResultList();
-            for (UserBean user : users) {
+            List<UserTableBean> users = session.createQuery("FROM user_table", UserTableBean.class).getResultList();
+            for (UserTableBean user : users) {
                 String plainPassword = user.getPassword();
                 if (!plainPassword.startsWith("$2a$")) { 
                     String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt());

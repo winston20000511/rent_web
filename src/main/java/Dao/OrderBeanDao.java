@@ -1,30 +1,24 @@
 package Dao;
 
 import java.util.List;
-import java.util.Map;
 
 import Bean.OrderBean;
+import DTO.OrderDetailsDTO;
 
-@SuppressWarnings("rawtypes")
 public interface OrderBeanDao {
 	
-	// READ
-	public List<OrderBean> getAllOrderBeans();
-	public OrderBean getOrderBeanByTradNo(String tradeNo);
+	List<OrderBean> getAllOrderBeans();
+	OrderBean getOrderBeanByTradNo(String tradeNo);
 	
-	// READ ORDER TABLE
-	public List<Map> getOrderTableData();
-	public List<Map> getOrderTableDataByTradNo(String tradNo);
-	public List<Map> getOrderTableDataByUserId(Integer userId);
-	public List<Map> getOrderTableDataByOrderStatus(Integer orderStatus);
-	public List<Map> getOrderTableDataByTradNoAndOrderStatus(String tradeNo, Integer orderStatus);
-	public List<Map> getOrderTableDataByUserIdAndOrderStatus(Integer userId, Integer orderStatus);
+	List<OrderDetailsDTO> getOrderTableData();
+	List<OrderDetailsDTO> getOrderTableDataByTradNo(String tradNo);
+	List<OrderDetailsDTO> getOrderTableDataByUserId(Integer userId);
+	List<OrderDetailsDTO> getOrderTableDataByOrderStatus(Short orderStatus);
+	List<OrderDetailsDTO> getOrderTableDataByTradNoAndOrderStatus(String tradeNo, Integer orderStatus);
+	List<OrderDetailsDTO> getOrderTableDataByUserIdAndOrderStatus(Integer userId, Integer orderStatus);
 	
-
-	// READ ORDER DETAILS
-	public List<Object[]> getOrderAdCombinedDataByTradNo(String tradNo);
+	OrderDetailsDTO getOrderAdCombinedDataByTradNo(String tradNo);
 	
-	// UPDATE
-	public OrderBean cancelOrderStatusByTradNo(String tradNo);
+	OrderBean cancelOrderStatusByTradNo(String tradNo);
 	
 }

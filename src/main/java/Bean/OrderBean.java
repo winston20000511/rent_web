@@ -4,152 +4,68 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
-@Table(name="orders_table")
+@Table(name = "orders_table")
 public class OrderBean {
 	
-	@Column(name="user_id")
-	private Integer userid;
-	
-	@Column(name="merchant_id")
-	private String merchantid;
+	@Column(name = "user_id")
+	private Long userId;
 	
 	@Id
-	@Column(name="merchantTradNo")
-	private String merchanttradno;
+	@Column(name = "merchantTradNo")
+	private String merchantTradNo;
 	
-	@Column(name="merchantTradDate")
-	private ZonedDateTime merchanttraddate;
+	@Column(name = "merchantTradDate")
+	private ZonedDateTime merchantTradDate;
 	
-	@Column(name="totalAmount")
-	private Integer totalamount;
+	@Column(name = "totalAmount")
+	private Long totalAmount;
 	
-	@Column(name="tradeDesc")
-	private String tradedesc;
+	@Column(name = "tradeDesc")
+	private String tradeDesc;
 	
-	@Column(name="itemName")
-	private String itemname;
+	@Column(name = "itemName")
+	private String itemName;
 	
-	@Column(name="order_status")
-	private Integer orderstatus;
+	@Column(name = "order_status", columnDefinition = "TINYINT")
+	private Short orderStatus;
 	
-	@Column(name="returnUrl")
-	private String returnurl;
-	
-	@Column(name="choosePayment")
-	private String choosepayment;
-	
-	@Column(name="checkMacValue")
-	private String checkmacvalue;
+	@Column(name = "choosePayment")
+	private String choosePayment;
 
+	@Column(name = "third_party")
+	private Short thirdParty;
+	
+	@Column(name = "returnValue")
+	private String returnValue;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="user_id", insertable=false, updatable=false)
+	@JsonIgnore
+	private UserTableBean user;
+	
 	@OneToMany(fetch=FetchType.LAZY, mappedBy="order", cascade = CascadeType.ALL)
 	private List<AdBean> ads = new ArrayList<AdBean>();
-	
+
 	public OrderBean() {
 	}
-
-	public Integer getUserid() {
-		return userid;
-	}
-
-	public void setUserid(Integer userid) {
-		this.userid = userid;
-	}
-
-	public String getMerchantid() {
-		return merchantid;
-	}
-
-	public void setMerchantid(String merchantid) {
-		this.merchantid = merchantid;
-	}
-
-	public String getMerchanttradno() {
-		return merchanttradno;
-	}
-
-	public void setMerchanttradno(String merchanttradno) {
-		this.merchanttradno = merchanttradno;
-	}
-
-	public ZonedDateTime getMerchanttraddate() {
-		return merchanttraddate;
-	}
-
-	public void setMerchanttraddate(ZonedDateTime merchanttraddate) {
-		this.merchanttraddate = merchanttraddate;
-	}
-
-	public Integer getTotalamount() {
-		return totalamount;
-	}
-
-	public void setTotalamount(Integer totalamount) {
-		this.totalamount = totalamount;
-	}
-
-	public String getTradedesc() {
-		return tradedesc;
-	}
-
-	public void setTradedesc(String tradedesc) {
-		this.tradedesc = tradedesc;
-	}
-
-	public String getItemname() {
-		return itemname;
-	}
-
-	public void setItemname(String itemname) {
-		this.itemname = itemname;
-	}
-
-	public Integer getOrderstatus() {
-		return orderstatus;
-	}
-
-	public void setOrderstatus(Integer orderstatus) {
-		this.orderstatus = orderstatus;
-	}
-
-	public String getReturnurl() {
-		return returnurl;
-	}
-
-	public void setReturnurl(String returnurl) {
-		this.returnurl = returnurl;
-	}
-
-	public String getChoosepayment() {
-		return choosepayment;
-	}
-
-	public void setChoosepayment(String choosepayment) {
-		this.choosepayment = choosepayment;
-	}
-
-	public String getCheckmacvalue() {
-		return checkmacvalue;
-	}
-
-	public void setCheckmacvalue(String checkmacvalue) {
-		this.checkmacvalue = checkmacvalue;
-	}
-
-	public List<AdBean> getAds() {
-		return ads;
-	}
-
-	public void setAds(List<AdBean> ads) {
-		this.ads = ads;
-	}
+	
 	
 }
+

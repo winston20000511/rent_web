@@ -3,6 +3,8 @@ package servlet;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,30 +61,29 @@ public class BookingServlet extends HttpServlet {
 	}
 
 	// 查詢所有預訂
-	private void listBooking(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		List<BookingBean> list = bookingDao.findAllBooking();
-		List<BookingDTO> dtoList = new ArrayList<>();
-		
-		for (BookingBean booking : list) {
-			
-	        BookingDTO dto = new BookingDTO(
-	    		booking.getBookingId(),
-	            booking.getHouseBean().getTitle(),
-	            booking.getUserBean().getName(),
-	            DateUtils.formatDate(booking.getBookingDate()),
-	            DateUtils.formatTime(booking.getStartTime()),
-	            DateUtils.formatTime(booking.getEndTime()),
-	            booking.getStatus()
-	        );
-	        dtoList.add(dto);
+	 private void listBooking(HttpServletRequest request, HttpServletResponse response)
+	            throws ServletException, IOException {
+	        List<BookingBean> list = bookingDao.findAllBooking();
+	        List<BookingDTO> dtoList = new ArrayList<>();
+
+	        for (BookingBean booking : list) {
+
+	            BookingDTO dto = new BookingDTO(
+	                booking.getBookingId(),
+	                booking.getHouse().getTitle(),
+	                booking.getRentUser().getName(),
+	                booking.getBookingDate(),
+	                booking.getBookingTime(),
+	                booking.getStatus()
+	            );
+	            dtoList.add(dto);
+	        }
+	        Gson gson = new Gson();
+	        String json = gson.toJson(dtoList);
+	        response.setContentType("application/json");
+	        response.setCharacterEncoding("UTF-8");
+	        response.getWriter().write(json);
 	    }
-		Gson gson = new Gson();
-		String json = gson.toJson(dtoList);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().write(json);
-	}
 
 	// 顯示編輯表單
 	private void showEditForm(HttpServletRequest request, HttpServletResponse response)
@@ -95,25 +96,25 @@ public class BookingServlet extends HttpServlet {
 
 	// 新增預訂
 	private void createBooking(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		BookingBean booking = new BookingBean();
-		booking.setHouseId(Long.parseLong(request.getParameter("house_id")));
-		booking.setUserId(Long.parseLong(request.getParameter("user_id")));
-		booking.setBookingDate(Date.valueOf(request.getParameter("booking_date")));
-		booking.setStartTime(Time.valueOf(request.getParameter("start_time")));
-		booking.setEndTime(Time.valueOf(request.getParameter("end_time")));
-		booking.setStatus(request.getParameter("status"));
+            throws ServletException, IOException {
+        BookingBean booking = new BookingBean();
+        booking.setHouseId(Long.parseLong(request.getParameter("house_id")));
+        booking.setUserId(Long.parseLong(request.getParameter("user_id")));
+        booking.setBookingDate(LocalDate.parse(request.getParameter("booking_date")));
+        booking.setBookingTime(LocalTime.parse(request.getParameter("booking_time")));
 
-		bookingDao.createBooking(booking);
-		response.sendRedirect("booking?action=list");
-	}
+        booking.setStatus(Byte.parseByte(request.getParameter("status")));
+
+        bookingDao.createBooking(booking);
+        response.sendRedirect("booking?action=list");
+    }
 
 	// 更新預訂
 	private void updateBooking(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		long bookingId = Long.parseLong(request.getParameter("bookingId"));
 
-		String status = request.getParameter("status");
+		Byte status = Byte.parseByte(request.getParameter("status")); 
 
 		boolean updateResult = bookingDao.updateBookingStatus(bookingId, status);
 

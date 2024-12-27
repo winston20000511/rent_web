@@ -10,5 +10,5 @@ public interface BookingDao {
 	boolean createBooking(BookingBean booking);
 	boolean deleteBooking(Long bookingId);
 	boolean updateBooking(BookingBean booking);
-	boolean updateBookingStatus(Long bookingId,String status);
+	boolean updateBookingStatus(Long bookingId, Byte status);
 }

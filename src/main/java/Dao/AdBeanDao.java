@@ -7,32 +7,23 @@ import Bean.AdBean;
 
 public interface AdBeanDao {
 	
-	// create by client
-	public boolean createAdBean(AdBean adBean) throws SQLException;
+	boolean createAdBean(AdBean adBean) throws SQLException;
 	
-	// r
-	public List<AdBean> getAllAdBeans();
-	public AdBean getAdBeanByAdId(Integer adId);
-	public List<AdBean> getAdBeansByUserId(Integer userId);
-	public List<AdBean> getAdBeansByHouseId(Integer houseId);
-	public List<AdBean> getAdBeansByIsPaid(Boolean isPaid);
-	public List<AdBean> getAdBeanByAdIdAndIsPaid(Integer adId, Boolean isPaid);
-	public List<AdBean> getAdBeansByHouseIdAndIsPaid(Integer houseId, Boolean isPaid);
-	public List<AdBean> getAdBeansByUserIdAndIsPaid(Integer userId, Boolean isPaid);
-	public List<AdBean> getAdBeansByOrderId(String orderId);
+	List<AdBean> getAllAdBeans();
+	AdBean getAdBeanByAdId(Integer adId);
+	List<AdBean> getAdBeansByUserId(Integer userId);
+	List<AdBean> getAdBeansByHouseId(Integer houseId);
+	List<AdBean> getAdBeansByIsPaid(Boolean isPaid);
+	List<AdBean> getAdBeanByAdIdAndIsPaid(Integer adId, Boolean isPaid);
+	List<AdBean> getAdBeansByHouseIdAndIsPaid(Integer houseId, Boolean isPaid);
+	List<AdBean> getAdBeansByUserIdAndIsPaid(Integer userId, Boolean isPaid);
+	List<AdBean> getAdBeansByOrderId(String orderId);
 	
-	public List<AdBean> getCanceledAdBeans();
-	/*
-	 	select*from ads_table
-		join orders_table
-		on ads_table.order_id = orders_table.merchantTradNo;
-	 */
+	List<AdBean> getCanceledAdBeans();
 	
-	// u
-	public boolean updateAdBean(AdBean adBean);
-	public AdBean updateAdBeanOnTypeAndQty(Integer adId, String adType, Integer Quantity);
+	boolean updateAdBean(AdBean adBean);
+	AdBean updateAdBeanOnAdTypeAndPrice(Integer adid, Integer adtypeId);
 	
-	// d
-	public boolean deleteAdBeanByAdId(Integer adId);
+	boolean deleteAdBeanByAdId(Integer adId);
 	
 }

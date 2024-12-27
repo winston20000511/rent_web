@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -27,6 +28,7 @@ import util.ZonedDateAdapter;
 @WebServlet("/AdDataOperationServelt.do")
 public class AdDataOperationServelt extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private Logger logger = Logger.getLogger(AdDataOperationServelt.class.getName());
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -76,6 +78,7 @@ public class AdDataOperationServelt extends HttpServlet {
 			switch (receivedData.get(0)) {
 			case "search":
 				List<AdViewBean> adList = adService.getFilteredAds(receivedData);
+				logger.info("ad list: " + adList.toString());
 				jsonResponse = gson.toJson(adList); // serialize
 				break;
 			case "adDetails":

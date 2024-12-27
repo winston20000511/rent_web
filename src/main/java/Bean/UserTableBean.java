@@ -14,16 +14,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
 @Table(name = "user_table")
+@ToString
 public class UserTableBean {
 
     @Id
@@ -43,10 +44,10 @@ public class UserTableBean {
     @Column(name = "phone", length = 20) // 手機號碼，非必填，長度限制 20 字
     private String phone;
 
-    @Column(name = "picture", nullable = true) // 使用者圖片，以二進制格式儲存，可選
+    @Column(name = "picture") // 使用者圖片，以二進制格式儲存
     private byte[] picture;
 
-    @Column(name = "createtime", updatable = false, insertable = false) // 建立時間，資料庫自動生成
+    @Column(name = "createtime") // 建立時間，資料庫自動生成，程式無需手動插入或更新
     private LocalDateTime createTime;
 
     @Column(name = "gender", nullable = false) // 性別必填，0 表示男，1 表示女
@@ -57,12 +58,6 @@ public class UserTableBean {
 
     @Column(name = "status", nullable = false) // 使用者狀態，1 表示啟用，0 表示停用
     private Byte status;
-
-    @Column(name = "resetToken") // 密碼重置 token
-    private String resetToken;
-
-//    @Column(name = "reset_token_expiry") // 密碼重置 token 的有效期
-//    private LocalDateTime resetTokenExpiry;
 
     // 與 HouseTableBean 的一對多關聯
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -79,11 +74,6 @@ public class UserTableBean {
     @JsonIgnore
     private List<HouseImageTableBean> images;
 
-    // 與 CollectTableBean 的一對多關聯
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<CollectTableBean> collect;
-
     // 與 AdBean 的一對多關聯
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
@@ -93,21 +83,4 @@ public class UserTableBean {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<OrderBean> orders;
-
-    // 設定重置密碼的 token 和有效期
-//    public void setResetToken(String token, LocalDateTime expiry) {
-//        this.resetToken = token;
-//        this.resetTokenExpiry = expiry;
-//    }
-
-    // 獲取重置密碼 token
-//    public String getResetToken() {
-//        return resetToken;
-//    }
-
-    // 檢查重置 token 是否有效
-//    public boolean isResetTokenValid() {
-//        return resetToken != null && resetTokenExpiry != null && resetTokenExpiry.isAfter(LocalDateTime.now());
-//    }
-
 }
