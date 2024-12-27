@@ -1,9 +1,7 @@
 package Dao;
 
 import java.util.List;
-import java.util.Map;
 
-import Bean.houseTableBean;
 import DTO.HouseDetailsDTO;
 import DTO.HouseSimpleInfoDTO;
 

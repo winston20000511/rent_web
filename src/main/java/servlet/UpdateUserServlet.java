@@ -43,8 +43,8 @@ public class UpdateUserServlet extends HttpServlet {
         String email = jsonObject.get("email").getAsString();
         String password = jsonObject.get("password").getAsString();
         String phone = jsonObject.get("phone").getAsString();
-        int gender = Integer.parseInt(jsonObject.get("gender").getAsString());
-        Integer status = Integer.parseInt(jsonObject.get("status").getAsString());
+        Byte gender = jsonObject.get("gender").getAsByte();
+        Byte status = jsonObject.get("status").getAsByte();
 
         String jsonResponse;
         Transaction transaction = null;

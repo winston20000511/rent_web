@@ -11,7 +11,7 @@ import org.hibernate.Session;
 
 import Bean.OrderBean;
 import IMPL.OrderBeanDaoImpl;
-import dto.OrderDetailsDTO;
+import DTO.OrderDetailsDTO;
 import util.TimeForm;
 
 @SuppressWarnings("rawtypes")

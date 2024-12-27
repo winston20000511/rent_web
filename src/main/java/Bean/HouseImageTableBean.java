@@ -1,11 +1,16 @@
 package Bean;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +31,13 @@ public class HouseImageTableBean {
     @Column(name = "image_url", columnDefinition = "VARBINARY(MAX)") // 二進位型別
     private byte[] images;
 
-    private Long houseId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "house_id", nullable = false) // 房屋ID作為外鍵
+    @JsonIgnore
+    private HouseTableBean house;
 
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false) // 用戶ID作為外鍵
+    @JsonIgnore
+    private UserTableBean user;
 }

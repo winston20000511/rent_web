@@ -107,7 +107,7 @@ public class BookingDaoImpl implements BookingDao {
 	}
 
 	@Override
-	public boolean updateBookingStatus(Long bookingId, String status) {
+	public boolean updateBookingStatus(Long bookingId, Byte status) {
 		Transaction transaction = null;
 
 		try (Session session = HibernateUtil.getSessionFactory().openSession()) {

@@ -1,10 +1,9 @@
 package Bean;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,125 +14,73 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import util.Exclude;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "user_table")
+@ToString
 public class UserTableBean {
 
-	@Id
-	@Column(name = "user_id")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer userId;
-	private String name;
-	private String email;
-	private String password;
-	private String phone;
-	private byte[] picture;
-	private Timestamp createtime;
-	private Integer gender;
-	private Integer status;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // 主鍵自動生成
+    @Column(name = "user_id") // 對應 user_id 欄位
+    private Long userId;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userBean", cascade = CascadeType.ALL)
-	@JsonInclude(JsonInclude.Include.NON_EMPTY) 
-	@Exclude
-	private List<BookingBean> bookings = new ArrayList<BookingBean>();
-	
-	//weirong
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "userBean", cascade = CascadeType.ALL)
-	@JsonInclude(JsonInclude.Include.NON_EMPTY) 
-	@Exclude
-	private List<houseTableBean> houses = new ArrayList<houseTableBean>();
-	
+    @Column(name = "name", nullable = false, length = 50) // 名稱必填，長度限制 50 字
+    private String name;
 
-	// Constructor
-	public UserTableBean(Integer userId, String name, String email, String password, String phone, byte[] picture,
-			Timestamp createtime, Integer gender, Integer status) {
-		this.userId = userId;
-		this.name = name;
-		this.email = email;
-		this.password = password;
-		this.phone = phone;
-		this.picture = picture;
-		this.createtime = createtime;
-		this.gender = gender;
-		this.status = status;
-	}
+    @Column(name = "email", nullable = false, unique = true, length = 50) // 電子郵件必填，唯一，長度限制 50 字
+    private String email;
 
-	public UserTableBean() {
-	}
+    @Column(name = "password", nullable = false, columnDefinition = "NVARCHAR(MAX)") // 密碼必填，允許長文本
+    private String password;
 
-	// Getters and Setters
-	public int getUserId() {
-		return userId;
-	}
+    @Column(name = "phone", length = 20) // 手機號碼，非必填，長度限制 20 字
+    private String phone;
 
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
+    @Column(name = "picture") // 使用者圖片，以二進制格式儲存
+    private byte[] picture;
 
-	public String getName() {
-		return name;
-	}
+    @Column(name = "createtime") // 建立時間，資料庫自動生成，程式無需手動插入或更新
+    private LocalDateTime createTime;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    @Column(name = "gender", nullable = false) // 性別必填，0 表示男，1 表示女
+    private Byte gender;
 
-	public String getEmail() {
-		return email;
-	}
+    @Column(name = "coupon", nullable = false) // 初始優惠券數量，預設為 3
+    private Byte coupon = 3;
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    @Column(name = "status", nullable = false) // 使用者狀態，1 表示啟用，0 表示停用
+    private Byte status;
 
-	public String getPassword() {
-		return password;
-	}
+    // 與 HouseTableBean 的一對多關聯
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore // 避免序列化時導致遞迴引用
+    private List<HouseTableBean> houses;
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    // 與 BookingBean 的一對多關聯
+    @OneToMany(mappedBy = "rentUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<BookingBean> bookings;
 
-	public String getPhone() {
-		return phone;
-	}
+    // 與 HouseImageTableBean 的一對多關聯
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<HouseImageTableBean> images;
 
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
+    // 與 AdBean 的一對多關聯
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<AdBean> ads;
 
-	public byte[] getPicture() {
-		return picture;
-	}
-
-	public void setPicture(byte[] picture) {
-		this.picture = picture;
-	}
-
-	public Timestamp getCreatetime() {
-		return createtime;
-	}
-
-	public void setCreatetime(Timestamp createtime) {
-		this.createtime = createtime;
-	}
-
-	public int getGender() {
-		return gender;
-	}
-
-	public void setGender(int gender) {
-		this.gender = gender;
-	}
-
-	public Integer getStatus() {
-		return status;
-	}
-
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
-
+    // 與 OrderBean 的一對多關聯
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<OrderBean> orders;
 }

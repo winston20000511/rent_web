@@ -1,22 +1,20 @@
 package servlet;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+
+import com.google.gson.Gson;
+
+import Bean.UserTableBean;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import util.HibernateUtil;
-
-import com.google.gson.Gson;
-
-import Bean.UserBean2;
-
-import org.hibernate.Session;
-import org.hibernate.query.Query;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
 
 @WebServlet("/LoadAllUsersServlet.do")
 public class LoadAllUsersServlet extends HttpServlet {
@@ -29,12 +27,12 @@ public class LoadAllUsersServlet extends HttpServlet {
 		response.setCharacterEncoding("UTF-8");
 		
 		
-		List<UserBean2> users;
+		List<UserTableBean> users;
 
 		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
 			// 使用 HQL 查詢
 			session.beginTransaction();
-			Query<UserBean2> query = session.createQuery("FROM UserBean2 ORDER BY createtime DESC", UserBean2.class);
+			Query<UserTableBean> query = session.createQuery("FROM UserBean2 ORDER BY createtime DESC", UserTableBean.class);
 //			System.out.println(query);
 			users = query.getResultList();
 			// 將用戶資料轉換為 JSON 格式

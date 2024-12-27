@@ -3,7 +3,7 @@ package Dao;
 import java.util.List;
 
 import Bean.OrderBean;
-import dto.OrderDetailsDTO;
+import DTO.OrderDetailsDTO;
 
 public interface OrderBeanDao {
 	

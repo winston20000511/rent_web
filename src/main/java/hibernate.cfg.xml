@@ -13,21 +13,18 @@
 		<property name="hibernate.format_sql">true</property>
 		<property name="hibernate.current_session_context_class">thread</property>
 
-		<mapping class="Bean.OrderBean" />
 		<mapping class="Bean.AdBean" />
-		<mapping class="Bean.AdtypeBean" />
 		<mapping class="Bean.AdminBean" />
+		<mapping class="Bean.AdtypeBean" />
 		<mapping class="Bean.AdViewBean" />
 		<mapping class="Bean.BookingBean" />
 		<mapping class="Bean.BookingDetilBean" />
-		<mapping class="Bean.houseTableBean" />
-		<mapping class="Bean.UserBean" />
-		<mapping class="Bean.UserBean2" />
+		<mapping class="Bean.ConditionTableBean" />
 		<mapping class="Bean.formComplationBean" />
-						
-		
-
-
-
-	</session-factory>
+		<mapping class="Bean.FurnitureTableBean" />	
+		<mapping class="Bean.HouseImageTableBean" />	
+		<mapping class="Bean.HouseTableBean" />
+		<mapping class="Bean.OrderBean" />
+		<mapping class="Bean.UserTableBean" />
+			</session-factory>
 </hibernate-configuration> 

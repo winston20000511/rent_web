@@ -8,7 +8,7 @@ import org.hibernate.query.Query;
 
 import Bean.OrderBean;
 import Dao.OrderBeanDao;
-import dto.OrderDetailsDTO;
+import DTO.OrderDetailsDTO;
 
 public class OrderBeanDaoImpl implements OrderBeanDao{
 	
