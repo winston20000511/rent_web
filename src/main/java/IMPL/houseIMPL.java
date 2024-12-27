@@ -3,6 +3,7 @@ package IMPL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,21 +72,20 @@ public class houseIMPL implements houseDAO {
     @Override
     public List<HouseSimpleInfoDTO> getPaginatedHouseList(int page, int pageSize, String keyword) {
         List<HouseSimpleInfoDTO> houses = new ArrayList<>();
-        String query = "SELECT h.house_id, h.title, h.price, h.address, h.status, u.user_id, u.name AS user_name, u.email AS user_email " +
+        String query = "SELECT h.house_id, h.title, h.price, h.address, h.status, " +
+                       "u.user_id, u.name AS user_name, u.email AS user_email " +
                        "FROM house_table h JOIN user_table u ON h.user_id = u.user_id " +
                        "WHERE u.name LIKE ? OR h.title LIKE ? " +
-                       "LIMIT ? OFFSET ?";
+                       "ORDER BY h.house_id " +
+                       "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
 
-        try (Connection conn = ConnectionUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            String searchKeyword = "%" + keyword + "%";
-            stmt.setString(1, searchKeyword);
-            stmt.setString(2, searchKeyword);
-            stmt.setInt(3, pageSize);
-            stmt.setInt(4, (page - 1) * pageSize);
+        try (PreparedStatement stmt = ConnectionUtil.getConnection().prepareStatement(query)) {
+            stmt.setString(1, "%" + keyword + "%");
+            stmt.setString(2, "%" + keyword + "%");
+            stmt.setInt(3, (page - 1) * pageSize); // OFFSET
+            stmt.setInt(4, pageSize);              // FETCH NEXT
 
             ResultSet rs = stmt.executeQuery();
-
             while (rs.next()) {
                 HouseSimpleInfoDTO house = new HouseSimpleInfoDTO();
                 house.setHouseId(rs.getLong("house_id"));
@@ -98,14 +98,14 @@ public class houseIMPL implements houseDAO {
                 house.setUserEmail(rs.getString("user_email"));
                 houses.add(house);
             }
-
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Database query error");
         }
 
         return houses;
     }
-
+    
     @Override
     public HouseDetailsDTO getHouseDetailsById(Long houseId) {
         HouseDetailsDTO houseDetails = null;
