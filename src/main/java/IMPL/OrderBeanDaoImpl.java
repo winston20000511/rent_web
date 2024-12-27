@@ -42,7 +42,13 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 	@Override
 	public List<OrderDetailsDTO> getOrderTableData() {
 		
-		String hqlstr = "select userId, merchantTradNo, merchantTradDate, orderStatus from OrderBean";
+		String hqlstr = 
+			    "select o.userId, o.merchantTradNo, o.merchantTradDate, o.choosePayment, o.orderStatus, " +
+			    "u.name, a.adId, adt.adName " +
+			    "from OrderBean o " +
+			    "join o.user u " +
+			    "join o.ads a " +
+			    "join a.adtype adt";
 		Query<OrderDetailsDTO> query = session.createQuery(hqlstr);
 		return query.list();
 	}
@@ -51,8 +57,12 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 	@Override
 	public List<OrderDetailsDTO> getOrderTableDataByTradNo(String tradNo) {
 		String hqlstr = 
-				"select new map(userid as userId, merchanttradno as merchantTradNo, merchanttraddate as merchantTradDate, orderstatus as orderStatus) "
-				+ "from OrderBean where merchanttradno=:merchanttradno order by merchanttraddate";
+			    "select o.userId, o.merchantTradNo, o.merchantTradDate, o.choosePayment, o.orderStatus, " +
+			    "u.name, a.adId, adt.adName " +
+			    "from OrderBean o " +
+			    "join o.user u " +
+			    "join o.ads a " +
+			    "join a.adtype adt";
 		
 		Query<OrderDetailsDTO> query = session.createQuery(hqlstr, OrderDetailsDTO.class);
 		query.setParameter("merchantTradNo", tradNo);

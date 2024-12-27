@@ -4,11 +4,15 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -51,10 +55,10 @@ public class OrderBean {
 	@Column(name = "returnValue")
 	private String returnValue;
 	
-//	@ManyToOne(fetch = FetchType.LAZY)
-//	@JoinColumn(name="user_id", insertable=false, updatable=false)
-//	@JsonIgnore
-//	private UserTableBean user;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="user_id", insertable=false, updatable=false)
+	@JsonIgnore
+	private UserBean user;
 	
 	@OneToMany(fetch=FetchType.LAZY, mappedBy="order", cascade = CascadeType.ALL)
 	private List<AdBean> ads = new ArrayList<AdBean>();

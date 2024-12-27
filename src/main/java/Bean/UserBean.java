@@ -49,6 +49,11 @@ public class UserBean {
 	@JsonInclude(JsonInclude.Include.NON_EMPTY) 
 	@Exclude
 	private List<AdBean> ads = new ArrayList<AdBean>();
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.ALL)
+	@JsonInclude(JsonInclude.Include.NON_EMPTY) 
+	@Exclude
+	private List<OrderBean> orders = new ArrayList<OrderBean>();
 
 	// Constructor
 	public UserBean(Integer userId, String name, String email, String password, String phone, byte[] picture,

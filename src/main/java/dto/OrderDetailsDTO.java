@@ -7,9 +7,9 @@ import lombok.ToString;
 @ToString
 public class OrderDetailsDTO {
 	
+	private Long userId;
 	private String orderId;
 	private String paidDate;
-	private Long userId;
 	private String userName;
 	private String paymentMethod;
 	private String orderStatus;
