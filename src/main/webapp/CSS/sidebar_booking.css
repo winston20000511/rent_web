@@ -1,15 +1,234 @@
 @charset "UTF-8";
+
 #myTable th, #myTable td {
-    text-align: center; /* 水平居中 */
-    vertical-align: middle; /* 垂直居中 */
+	text-align: center; /* 水平居中 */
+	vertical-align: middle; /* 垂直居中 */
 }
 
-#myTable .btn{
+#myTable .btn {
 	margin-left: 20pX;
 }
 
 .dt-paging {
+	display: flex;
+	justify-content: center; /* 水平置中 */
+}
+
+.details-btn {
+	color: rgb(73, 69, 54);
+	background-color: rgb(245, 221, 145);
+	border-radius: 3px;
+	border: 1px solid rgb(174, 153, 85);
+}
+
+.details-btn:hover {
+	background-color: rgb(174, 153, 85);
+	border: 1px solid rgb(174, 153, 85);
+}
+
+.edit-btn {
+	color: rgb(73, 69, 54);
+	background-color: rgb(210, 210, 210);
+	border-radius: 3px;
+	border: 1px solid rgb(140, 140, 140);
+}
+
+.edit-btn:hover {
+	background-color: rgb(130, 130, 130);
+	border: 1px solid rgb(140, 140, 140);
+}
+
+.update-btn {
+	color: rgb(73, 69, 54);
+	background-color: rgb(190, 230, 190);
+	border-radius: 3px;
+	border: 1px solid rgb(120, 160, 120);
+}
+
+.update-btn:hover {
+	background-color: rgb(160, 200, 160);
+	border: 1px solid rgb(90, 130, 90);
+}
+
+.cancel-btn {
+	color: rgb(73, 69, 54);
+	background-color: rgb(250, 130, 130);
+	border-radius: 3px;
+	border: 1px solid rgb(180, 60, 60);
+}
+
+.cancel-btn:hover {
+	background-color: rgb(220, 100, 100);
+	border: 1px solid rgb(150, 30, 30);
+}
+
+/* 禁用按鈕的樣式 */
+button:disabled {
+	background-color: #d3d3d3; /* 淺灰色背景 */
+	color: #a9a9a9; /* 淺灰色文字 */
+	border: 1px solid #d3d3d3; /* 淺灰色邊框 */
+	cursor: not-allowed; /* 禁用光標 */
+}
+
+/* 用 Flexbox 控制編輯欄位的排列 */
+.edit-container {
+	display: flex;
+	justify-content: end; 
+	flex-wrap : wrap; /* 讓欄位可以換行，避免擠在同一行 */
+	gap: 20px;
+	flex-wrap: wrap; /* 欄位間距 */
+}
+
+.edit-field {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	width: 220px; /* 每個欄位的寬度 */
+}
+
+.edit-field label {
+	font-weight: bold;
+	margin-bottom: 5px; /* 標籤和輸入框之間的距離 */
+}
+
+.edit-field input, .edit-field select {
+	padding: 5px;
+	font-size: 14px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	width: 100%; /* 填滿欄位的寬度 */
+}
+
+
+/*           自定義彈窗+遮罩 (為避免跟bootstrap 及backstage CSS重複)                  */
+
+/* 自訂遮罩層 */
+.custom-overlay {
+    display: none; /* 預設隱藏 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* 半透明背景 */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* 彈窗 */
+.custom-popup {
+    background-color: #fff;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+/* 標題 */
+.custom-popup-header {
     display: flex;
-    justify-content: center; /* 水平置中 */
-    
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.custom-popup-title {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* 關閉按鈕 */
+.custom-popup-close {
+    font-size: 22px;
+    background: none;
+    border: none;
+    color: #333;
+    cursor: pointer;
+}
+
+/* 詳情區域 */
+.custom-popup-body {
+    padding: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #555;
+}
+
+/* 資料卡片 */
+.custom-detail-card {
+    display: flex;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.custom-detail-card img {
+    width: 150px;
+    height: 100%;
+    object-fit: cover;
+}
+
+.custom-detail-card-content {
+    padding: 15px;
+    flex-grow: 1;
+}
+
+.custom-detail-card-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.custom-detail-card-text {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.custom-popup-footer {
+    padding: 12px;
+    text-align: right;
+    background-color: #f8f9fa;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+/* 底部關閉按鈕 */
+.custom-popup-close-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.custom-popup-close-btn:hover {
+    background-color: #0056b3;
+}
+
+/* 表格樣式 */
+.custom-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.custom-detail-table th, .custom-detail-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.custom-detail-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.custom-detail-table td {
+    background-color: #fff;
 }

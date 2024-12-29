@@ -77,22 +77,43 @@
 		<%-- Content --%>
 		<div class="content">
 			<div class="content">
-				<h1>預約管理</h1>
-				<table id="myTable" class="display">
-					<thead>
-						<tr>
-							<th>預約編號</th>
-							<th>房屋標題</th>
-							<th>預約者姓名</th>
-							<th>預約日期</th>
-							<th>預約時間</th>
-							<th>狀態</th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody id="tableBody">
-					</tbody>
-				</table>
+				<div class="content">
+					<h1>預約管理</h1>
+					<table id="myTable" class="display">
+						<thead>
+							<tr>
+								<th>預約編號</th>
+								<th>房屋標題</th>
+								<th>屋主姓名</th>
+								<th>預約者姓名</th>
+								<th>預約日期</th>
+								<th>狀態</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody id="tableBody">
+							<!-- DataTables 將自動填充數據 -->
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 自訂遮罩與彈窗 -->
+	<div id="customOverlay" class="custom-overlay">
+		<div class="custom-popup">
+			<div class="custom-popup-header">
+				<span class="custom-popup-title">預約詳情</span>
+				<button type="button" class="custom-popup-close"
+					onclick="closePopup()">&times;</button>
+			</div>
+			<div class="custom-popup-body">
+				<!-- 詳情內容將通過 JavaScript 動態插入 -->
+			</div>
+			<div class="custom-popup-footer">
+				<button type="button" class="custom-popup-close-btn"
+					onclick="closePopup()">關閉</button>
 			</div>
 		</div>
 	</div>
@@ -143,10 +164,14 @@
 	<div id="settingsModalBackdrop" class="modal-backdrop"></div>
 
 	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+		crossorigin="anonymous"></script>
 	<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script src="JS/backstage.js"></script>
-	<script src="JS/sidebar_booking.js"></script>
+	<script src="JS/sidebar_booking1.js"></script>
 	<script>
 	
     $(function() {	

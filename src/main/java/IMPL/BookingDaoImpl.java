@@ -1,5 +1,7 @@
 package IMPL;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,11 +10,105 @@ import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import Bean.BookingBean;
+import DTO.BookingDTO;
 import Dao.BookingDao;
 import util.HibernateUtil;
 
 public class BookingDaoImpl implements BookingDao {
 	
+	@Override
+	public List<BookingDTO> findBookingsByPage(String searchValue, String orderByColumn, String orderDir, int start, int length) {
+	    String hql = "SELECT new DTO.BookingDTO(b.bookingId, h.houseId, h.title, h.address, h.price, hu.userId, "
+	            + "hu.name, hu.email, hu.phone, ru.userId, ru.name, ru.email, ru.phone, b.createDate, "
+	            + "b.bookingDate, b.bookingTime, b.status) "
+	            + "FROM BookingBean b "
+	            + "JOIN b.house h "
+	            + "JOIN h.user hu "
+	            + "JOIN b.rentUser ru "
+	            + "WHERE h.title LIKE :search OR hu.name LIKE :search OR ru.name LIKE :search "
+	            + "ORDER BY " + orderByColumn + " " + orderDir;
+	    
+	    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+	        Query<BookingDTO> query = session.createQuery(hql, BookingDTO.class);
+	        query.setParameter("search", "%" + searchValue + "%");
+	        query.setFirstResult(start);
+	        query.setMaxResults(length);
+
+	        return query.getResultList();
+	    }
+	}
+	
+	@Override
+	public long countTotal() {
+	    String hql = "SELECT COUNT(b.bookingId) FROM BookingBean b";
+	    
+	    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+	        Query<Long> query = session.createQuery(hql, Long.class);
+	        return query.uniqueResult();
+	    }
+	}
+	
+	@Override
+	public long countFiltered(String searchValue) {
+	    String hql = "SELECT COUNT(b.bookingId) FROM BookingBean b "
+	    		+ "JOIN b.house h "
+	    		+ "JOIN h.user hu "
+	    		+ "JOIN b.rentUser ru "
+	            + "WHERE h.title LIKE :search OR hu.name LIKE :search OR ru.name LIKE :search ";
+	    
+	    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+	        Query<Long> query = session.createQuery(hql, Long.class);
+	        query.setParameter("search", "%" + searchValue + "%");
+	        return query.uniqueResult();
+	    }
+	}
+	
+	
+	@Override
+    public BookingDTO findBookingById(Long bookingId) {
+
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+
+            String hql = """
+                SELECT new BookingDTO(
+                    b.id AS bookingId,
+                    h.id AS houseId,
+                    h.title AS houseTitle,
+                    h.address AS houseAddress,
+                    h.price AS housePrice,
+                    o.id AS houseOwnerId,
+                    o.name AS houseOwnerName,
+                    o.email AS houseOwnerEmail,
+                    o.phone AS houseOwnerphone,
+                    u.id AS userId,
+                    u.name AS userName,
+                    u.email AS userEmail,
+                    u.phone AS userphone,
+                    b.createDate AS createDate,
+                    b.bookingDate AS bookingDate,
+                    b.bookingTime AS bookingTime,
+                    b.status AS status
+                )
+                FROM Booking b
+                JOIN b.house h
+                JOIN h.owner o
+                JOIN b.user u
+                WHERE b.id = :bookingId
+            """;
+
+            // 執行查詢並返回結果
+            return session.createQuery(hql, BookingDTO.class)
+                          .setParameter("bookingId", bookingId)
+                          .uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error retrieving booking by ID", e);
+        }
+    }
+	
+	
+	
+	//以下是舊的////////////////////////
 	
 	@Override
 	public BookingBean findByHouseId(Long houseId) {
@@ -31,23 +127,44 @@ public class BookingDaoImpl implements BookingDao {
 	}
 
 	@Override
-	public List<BookingBean> findAllBooking() {
-//		String hql = "FROM BookingBean b "
-//				+ "JOIN b.userBean u " + "JOIN b.houseBean h " + "ORDER BY b.bookingId DESC";
-		List<BookingBean> list = new ArrayList<BookingBean>();
+	public List<BookingDTO> findAllBooking() {
+		List<BookingDTO> dtoList = new ArrayList<>();
 
 		try (Session session = HibernateUtil.getSessionFactory().getCurrentSession()) {
 			session.beginTransaction();
+			String hql = "SELECT new BookingDTO( " +
+	                "b.bookingId, " +
+	                "b.houseId, " +
+	                "h.title, " +
+	                "h.address, " +
+	                "h.price, " +
+	                "hu.userId, " +
+	                "hu.name, " +
+	                "hu.email, " +
+	                "hu.phone, " +
+	                "ru.userId, " +
+	                "ru.name, " +
+	                "ru.email, " +
+	                "ru.phone, " +
+	                "b.createDate, " +
+	                "b.bookingDate, " +
+	                "b.bookingTime, " +
+	                "b.status) " +
+	                "FROM BookingBean b " +
+	                "JOIN b.house h " +
+	                "JOIN h.user hu " +
+	                "JOIN b.rentUser ru " +
+	                "ORDER BY b.bookingId DESC";
 			
-			Query<BookingBean> query = session.createQuery("FROM BookingBean", BookingBean.class);
+			Query<BookingDTO> query = session.createQuery(hql, BookingDTO.class);
+			dtoList = query.getResultList();
 			
-			list = query.getResultList();
-			
+
 			session.getTransaction().commit();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return list;
+		return dtoList;
 	}
 
 	@Override
@@ -107,7 +224,7 @@ public class BookingDaoImpl implements BookingDao {
 	}
 
 	@Override
-	public boolean updateBookingStatus(Long bookingId, Byte status) {
+	public boolean updateBookingStatus(Long bookingId, LocalDate bookingDate, LocalTime bookingTime, Byte status) {
 		Transaction transaction = null;
 
 		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -115,6 +232,8 @@ public class BookingDaoImpl implements BookingDao {
 			BookingBean bookingToUpdate = session.get(BookingBean.class, bookingId);
 			if (bookingToUpdate != null) {
 				bookingToUpdate.setStatus(status);
+				bookingToUpdate.setBookingDate(bookingDate);
+				bookingToUpdate.setBookingTime(bookingTime);
 				session.merge(bookingToUpdate);
 				transaction.commit();
 				return true;
