@@ -58,7 +58,7 @@ public class OrderBean {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="user_id", insertable=false, updatable=false)
 	@JsonIgnore
-	private UserBean user;
+	private UserTableBean user;
 	
 	@OneToMany(fetch=FetchType.LAZY, mappedBy="order", cascade = CascadeType.ALL)
 	private List<AdBean> ads = new ArrayList<AdBean>();
@@ -68,4 +68,3 @@ public class OrderBean {
 	
 	
 }
-

@@ -15,8 +15,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import Bean.AdViewBean;
 import Dao.AdService;
+import dto.AdDetailResponseDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -77,12 +77,12 @@ public class AdDataOperationServelt extends HttpServlet {
 
 			switch (receivedData.get(0)) {
 			case "search":
-				List<AdViewBean> adList = adService.getFilteredAds(receivedData);
+				List<AdDetailResponseDTO> adList = adService.getFilteredAds(receivedData);
 				logger.info("ad list: " + adList.toString());
 				jsonResponse = gson.toJson(adList); // serialize
 				break;
 			case "adDetails":
-				AdViewBean adView = adService.getAdDetails(receivedData);
+				AdDetailResponseDTO adView = adService.getAdDetails(receivedData);
 				jsonResponse = gson.toJson(adView);
 				break;
 			case "adUpdate":

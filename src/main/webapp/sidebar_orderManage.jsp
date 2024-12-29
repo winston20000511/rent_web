@@ -62,7 +62,7 @@
 					href="sidebar_booking.jsp" data-content="sidebar_booking">預約管理系統<span
 						class="bi bi-caret-right-fill caret-icon"></span></a></li>
 				<li><a class="bi bi-badge-ad" href="sidebar_adManage.jsp"
-					data-content="sidebar_adOrder">廣告管理系統<span
+					data-content="sidebar_adOrder">VIP服務物件管理系統<span
 						class="bi bi-caret-right-fill caret-icon"></span></a></li>
 				<li><a class="bi bi-wallet" href="sidebar_orderManage.jsp"
 					data-content="sidebar_settings">訂單管理系統<span
@@ -80,25 +80,30 @@
 			<div class="Content">
 				<div class="Content">
 					<h1>訂單管理</h1>
-					<div class="search-box">
-						<label class="select-box-label"> <select
+					<div>
+						<label class="select-box-label"> 
+						<select
 							name="searchCondition" id="search-condition">
-								<option value="all">所有廣告</option>
+								<option value="all" selected>所有訂單</option>
 								<option value="merchantTradNo">訂單編號</option>
 								<option value="userId">屋主編號</option>
 						</select>
-						</label> <label class="select-box-label"> <select
-							name="orderStatus" id="order-status">
-								<option value="" disabled selected>訂單狀態</option>
-								<option value="all">顯示全部</option>
-								<option value="active">一般訂單</option>
-								<option value="canceled">已取消訂單</option>
-						</select>
-						</label> <label class="select-box-label"> <input type="text"
-							name="searchInput" id="search-inupt-box"
-							placeholder="請輸入編號（搜尋所有廣告時請空白）" />
+						</label> <label class="select-box-label" > <input type="text"
+							name="searchInput" id="search-input-box"
+							style="display: none;" />
 						</label>
+
+						<label class="select-box-label"> <select
+							name="orderStatus" id="order-status">
+								<option value="all" selected>顯示全部</option>
+								<option value="1">一般訂單</option>
+								<option value="0">已取消訂單</option>
+						</select>
+						</label> 
+
 						<button id="search" class="btn" type="button">搜尋</button>
+
+						
 					</div>
 
 					<div>
@@ -109,6 +114,7 @@
 									<tr>
 										<th>訂單編號</th>
 										<th>用戶編號</th>
+										<th>用戶姓名</th>
 										<th>訂單狀態</th>
 										<th>下單時間</th>
 										<th>操作功能</th>
@@ -116,10 +122,12 @@
 								</thead>
 								<tbody>
 									<tr>
-										<td class="order-id"></td>
-										<td class="user-id"></td>
 										<td></td>
-										<td class="order-time"></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
 									</tr>
 								</tbody>
 							</table>

@@ -1,23 +1,14 @@
 package Dao;
 
 import java.util.List;
-import java.util.Map;
 
-import Bean.houseTableBean;
+import dto.HouseDetailsDTO;
+import dto.HouseSimpleInfoDTO;
 
 public interface houseDAO {
 	
-	// Read
-	houseTableBean findHouseById(int houseId);
-	List<houseTableBean> getAllHouses();
-
-
-	// Create
-	boolean createHouse(houseTableBean houseTB);
-
-	// Update
-	boolean updateHouse(Map<String, Object> updates, int houseId);
-
-	// Delete
-	boolean deleteHouseById(int houseId);
+	boolean updateHouseDetailsWithoutImageAndUser(Long houseId, HouseDetailsDTO houseDetails);
+    List<HouseSimpleInfoDTO> getPaginatedHouseList(int page, int pageSize, String keyword);
+    HouseDetailsDTO getHouseDetailsById(Long houseId);
+    byte[] getSmallestImageByHouseId(Long houseId);
 }

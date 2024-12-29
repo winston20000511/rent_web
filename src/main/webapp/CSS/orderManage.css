@@ -1,27 +1,30 @@
 
 .select-box-label {
-	border-right: 3px solid #343a40;
+	/* border: 3px solid #343a40; */
+	border-radius: 2px;
 	margin: 0 5px 0 0;
 }
 
-.search-box {
+/* .search-box {
 	border: 1px solid #343a40;
 	border-radius: 5px;
 	width: 600px;
-}
+} */
 
 #search-condition, #order-status {
-	border: none;
-	border-radius: 10px;
-	padding: 2px;
-	outline: none;
+	/* border: 3px solid #343a40; */
+	border-radius: 2px;
+	padding: 4px;
+	/* outline: none; */
 }
 
 #search-inupt-box {
-	border: 0px;
-	outline: none;
+	border-bottom: 2px solid #343a40;
+	border-radius: 2px;
 	text-align: center;
 	width: 300px;
+	outline: none;
+	display: none;
 }
 
 button {
@@ -34,6 +37,18 @@ button {
 .btn:hover {
 	background-color: #495057;
 	color: rgb(241, 241, 241);
+}
+
+.delete-btn {
+	color: rgb(73, 69, 54);
+	background-color: rgb(240, 128, 128);
+	border-radius: 3px;
+	border: 1px solid rgb(205, 92, 92);
+}
+
+.delete-btn:hover {
+	background-color: rgb(205, 92, 92);
+	border: 1px solid rgb(205, 92, 92);
 }
 
 #search {

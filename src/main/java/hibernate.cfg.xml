@@ -9,21 +9,22 @@
 		<property name="hibernate.connection.url">jdbc:sqlserver://localhost:1433;databaseName=RentDB;encrypt=true;trustServerCertificate=true</property>
 		<property name="hibernate.connection.username">sa</property>
 		<property name="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</property>
-		<property name="hibernate.show_sql">true</property>
-		<property name="hibernate.format_sql">true</property>
+		<property name="hibernate.show_sql">false</property>
+		<property name="hibernate.format_sql">false</property>
 		<property name="hibernate.current_session_context_class">thread</property>
 
-		<mapping class="Bean.OrderBean" />
 		<mapping class="Bean.AdBean" />
-		<mapping class="Bean.AdtypeBean" />
 		<mapping class="Bean.AdminBean" />
-		<mapping class="Bean.AdViewBean" />
+		<mapping class="Bean.AdtypeBean" />
 		<mapping class="Bean.BookingBean" />
-		<mapping class="Bean.BookingDetilBean" />
-		<mapping class="Bean.houseTableBean" />
-		<mapping class="Bean.UserBean" />
-		<mapping class="Bean.UserBean2" />
+		<mapping class="Bean.ConditionTableBean" />
 		<mapping class="Bean.formComplationBean" />
+		<mapping class="Bean.FurnitureTableBean" />
+		<mapping class="Bean.HouseImageTableBean" />
+		<mapping class="Bean.HouseTableBean" />
+		<mapping class="Bean.OrderBean" />
+		<mapping class="Bean.UserTableBean" />
+		
 						
 		
 

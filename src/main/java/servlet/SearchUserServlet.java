@@ -5,19 +5,19 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+
 import com.google.gson.Gson;
 
-import Bean.UserBean2;
+import Bean.UserTableBean;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import util.HibernateUtil;
-
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.query.Query;
 
 @WebServlet("/SearchUserServlet.do")
 public class SearchUserServlet extends HttpServlet {
@@ -29,26 +29,26 @@ public class SearchUserServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
 
         try (PrintWriter out = response.getWriter()) {
-            List<UserBean2> users = new ArrayList<>();
+            List<UserTableBean> users = new ArrayList<>();
             Transaction transaction = null;
 
             try (Session session = HibernateUtil.getSessionFactory().openSession()) {
                 transaction = session.beginTransaction();
-                Query<UserBean2> query;
+                Query<UserTableBean> query;
 
                 if (searchInput == null || searchInput.isEmpty()) {
                     // 階段一：未輸入任何搜尋條件，顯示所有用戶資料並按創建時間降序排序
-                    query = session.createQuery("FROM UserBean2 ORDER BY createtime DESC", UserBean2.class);
+                    query = session.createQuery("FROM UserBean2 ORDER BY createtime DESC", UserTableBean.class);
                 } else {
                     // 階段二、三：根據搜尋條件顯示符合的資料
                     if ("userId".equals(searchType)) {
-                        query = session.createQuery("FROM UserBean2 WHERE userId = :userId", UserBean2.class);
+                        query = session.createQuery("FROM UserBean2 WHERE userId = :userId", UserTableBean.class);
                         query.setParameter("userId", Integer.parseInt(searchInput));
                     } else if ("userName".equals(searchType)) {
-                        query = session.createQuery("FROM UserBean2 WHERE name LIKE :name", UserBean2.class);
+                        query = session.createQuery("FROM UserBean2 WHERE name LIKE :name", UserTableBean.class);
                         query.setParameter("name", searchInput + "%");
                     } else { // 預設為 email 搜尋
-                        query = session.createQuery("FROM UserBean2 WHERE email LIKE :email", UserBean2.class);
+                        query = session.createQuery("FROM UserBean2 WHERE email LIKE :email", UserTableBean.class);
                         query.setParameter("email", searchInput + "%");
                     }
                 }

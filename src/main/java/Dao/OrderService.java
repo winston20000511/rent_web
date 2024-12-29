@@ -9,12 +9,12 @@ import java.util.logging.Logger;
 
 import org.hibernate.Session;
 
+import Bean.AdBean;
 import Bean.OrderBean;
 import IMPL.OrderBeanDaoImpl;
-import dto.OrderDetailsDTO;
+import dto.OrderDetailsResponseDTO;
 import util.TimeForm;
 
-@SuppressWarnings("rawtypes")
 public class OrderService {
 
 	private Logger logger = Logger.getLogger(OrderService.class.getName());
@@ -23,46 +23,35 @@ public class OrderService {
 	public OrderService(Session session) {
 		orderBeanDao = new OrderBeanDaoImpl(session);
 	}
-
-	/**
-	 * 取得篩選的訂單 receivedData = ["search", "searchCondition", "orderStatus", "userInput"]
-	 * @param receivedData
-	 * @return
-	 */
-	public List<OrderDetailsDTO> getFilteredOrders(List<String> receivedData) {
-		
-		logger.info("get filtered orders: " + receivedData.toString());
-
-		List<OrderDetailsDTO> dataList = new ArrayList<>();
-
-		// 沒有輸入篩選值時
-		if (receivedData.get(3).isEmpty()) {
-			logger.info("沒有輸入篩選值");
-			dataList = getOrdersByStatus(receivedData.get(2));
-			return dataList;
-		}
-
-		// 有輸入篩選值時
-		if (receivedData.get(1).equals("merchantTradNo")) {
-			dataList = getOrdersByTradNo(receivedData);
-		} else if (receivedData.get(1).equals("userId")) {
-			dataList = getOrdersByUserId(receivedData);
-		}
-
-		reformedOrderDetails(dataList);
-		return dataList.isEmpty() ? null : dataList;
-	}
 	
+	public List<OrderDetailsResponseDTO> getAllOrders(){
+		
+		logger.info("get all orders");
+		List<OrderBean> allOrders = orderBeanDao.getAllOrders();
+		List<OrderDetailsResponseDTO> orderDetailsDTOs = setupOrderDetailDTOs(allOrders);
+		
+		logger.info("get all orders: " + orderDetailsDTOs.toString());
+		
+		return orderDetailsDTOs;
+	}
+
 	/**
-	 * 取得訂單詳細資料 receivedData = ["orderDetail", "merchantTradNo"]
+	 * 取得篩選的訂單 filterParams = {"searchCondition":"","orderStatus":"","input":""}
 	 * @param receivedData
 	 * @return
 	 */
-	public OrderDetailsDTO getOrderDetailsByTradNo(List<String> receivedData) {
+	public List<OrderDetailsResponseDTO> filterOrders(Map<String, Object> filterParams) {
 		
-		logger.info("get order details by tradNo: " + receivedData.toString());
+		logger.info("get filtered orders: " + filterParams.toString());
+
+		String condition = (String) filterParams.get("searchCondition");
+		String orderStatus = (String) filterParams.get("orderStatus");
+		String input = (String) filterParams.get("input");
 		
-		return orderBeanDao.getOrderAdCombinedDataByTradNo(receivedData.get(1));
+		List<OrderBean> filterOrders = orderBeanDao.filterOrders(condition, orderStatus, input);
+		List<OrderDetailsResponseDTO> orderDetailDTOs = setupOrderDetailDTOs(filterOrders);
+		
+		return orderDetailDTOs;
 	}
 
 	/**
@@ -85,78 +74,55 @@ public class OrderService {
 		return orderTableData;
 	}
 	
-	/**
-	 * 依訂單狀態篩選符合的訂單
-	 * @param orderStatus
-	 * @return
-	 */
-	private List<OrderDetailsDTO> getOrdersByStatus(String orderStatus) {
-		switch (orderStatus) {
-		case "active":
-			return orderBeanDao.getOrderTableDataByOrderStatus((short)1);
-		case "canceled":
-			return orderBeanDao.getOrderTableDataByOrderStatus((short)0);
-		default:
-			logger.info("order service: " + orderBeanDao.getOrderTableData());
-			return orderBeanDao.getOrderTableData();
+	
+	private List<OrderDetailsResponseDTO> setupOrderDetailDTOs(List<OrderBean> orders) {
+		List<OrderDetailsResponseDTO> orderDetails = new ArrayList<>();
+		List<Long> houseIds = new ArrayList<>();
+		List<String> houseTitles = new ArrayList<>();
+		List<Long> adIds = new ArrayList<>();
+		List<String> adtypes = new ArrayList<>();
+		
+		for(OrderBean order : orders) {
+			OrderDetailsResponseDTO detailDTO = new OrderDetailsResponseDTO();
+			detailDTO.setUserId(order.getUserId());
+			detailDTO.setUserName(order.getUser().getName());
+			detailDTO.setOrderId(order.getMerchantTradNo());
+			detailDTO.setPaidDate(TimeForm.convertZonedDateTimeToString(order.getMerchantTradDate()));
+			detailDTO.setPaymentMethod(order.getChoosePayment());
+			detailDTO.setOrderStatus(order.getOrderStatus());
+			detailDTO.setAdPeriod(null); // 要另外計算
+			List<AdBean> ads = order.getAds();
+			for(AdBean ad : ads) {
+				houseIds.add(ad.getHouse().getHouseId());
+				houseTitles.add(ad.getHouse().getTitle());
+				adIds.add(ad.getAdId());
+				adtypes.add(ad.getAdtype().getAdName());
+			}
+			detailDTO.setHouseIds(houseIds);
+			detailDTO.setHouseTitles(houseTitles);
+			detailDTO.setAdIds(adIds);
+			detailDTO.setAdtypes(adtypes);
+			
+			orderDetails.add(detailDTO);
 		}
 		
-	}
-
-	/**
-	 * 以訂單號碼取得訂單資料
-	 * @param receivedData
-	 * @return
-	 */
-	private List<OrderDetailsDTO> getOrdersByTradNo(List<String> receivedData) {
-		
-		logger.info("get orders by tradNo: " + receivedData);
-		
-		String tradNo = receivedData.get(3);
-		switch (receivedData.get(2)) {
-		case "active":
-			return orderBeanDao.getOrderTableDataByTradNoAndOrderStatus(tradNo, 1);
-		case "canceled":
-			return orderBeanDao.getOrderTableDataByTradNoAndOrderStatus(tradNo, 0);
-		default:
-			return orderBeanDao.getOrderTableDataByTradNo(tradNo);
-		}
-		
-	}
-
-	/**
-	 * 以 user id 取的訂單資料
-	 * @param receivedData
-	 * @return
-	 */
-	private List<OrderDetailsDTO> getOrdersByUserId(List<String> receivedData) {
-		
-		logger.info("get orders by user id: " + receivedData);
-		
-		int userId = Integer.valueOf(receivedData.get(3));
-		switch (receivedData.get(2)) {
-		case "active":
-			return orderBeanDao.getOrderTableDataByUserIdAndOrderStatus(userId, 1);
-		case "canceled":
-			return orderBeanDao.getOrderTableDataByUserIdAndOrderStatus(userId, 0);
-		default:
-			return orderBeanDao.getOrderTableDataByUserId(userId);
-		}
+		return orderDetails;
 	}
 	
 	/**
 	 * 處理訂單詳細資料中的資料顯示內容
 	 * @param dataList
 	 */
-	private void reformedOrderDetails(List<OrderDetailsDTO> dataList) {
+	private void reformedOrderDetails(List<OrderDetailsResponseDTO> dataList) {
 	    try {
 	    	
 	    	logger.info("reformed order details: " + dataList);
-	        for (OrderDetailsDTO order : dataList) {
+	        for (OrderDetailsResponseDTO order : dataList) {
 	        }
 	    } catch (ClassCastException exception) {
 	        logger.severe("型別轉換錯誤");
 	        logger.severe(exception.getMessage());
 	    }
 	}
+	
 }

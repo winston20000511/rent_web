@@ -3,22 +3,14 @@ package Dao;
 import java.util.List;
 
 import Bean.OrderBean;
-import dto.OrderDetailsDTO;
+import dto.OrderDetailsResponseDTO;
 
 public interface OrderBeanDao {
 	
-	List<OrderBean> getAllOrderBeans();
 	OrderBean getOrderBeanByTradNo(String tradeNo);
-	
-	List<OrderDetailsDTO> getOrderTableData();
-	List<OrderDetailsDTO> getOrderTableDataByTradNo(String tradNo);
-	List<OrderDetailsDTO> getOrderTableDataByUserId(Integer userId);
-	List<OrderDetailsDTO> getOrderTableDataByOrderStatus(Short orderStatus);
-	List<OrderDetailsDTO> getOrderTableDataByTradNoAndOrderStatus(String tradeNo, Integer orderStatus);
-	List<OrderDetailsDTO> getOrderTableDataByUserIdAndOrderStatus(Integer userId, Integer orderStatus);
-	
-	OrderDetailsDTO getOrderAdCombinedDataByTradNo(String tradNo);
-	
+	List<OrderBean> getAllOrders();
+	List<OrderBean> filterOrders(String searchCondition, String orderStatus, String input);
+	OrderDetailsResponseDTO getOrderAdCombinedDataByTradNo(String tradNo);
 	OrderBean cancelOrderStatusByTradNo(String tradNo);
 	
 }

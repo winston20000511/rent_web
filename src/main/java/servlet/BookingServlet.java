@@ -68,8 +68,8 @@ public class BookingServlet extends HttpServlet {
 			
 	        BookingDTO dto = new BookingDTO(
 	    		booking.getBookingId(),
-	            booking.getHouseBean().getTitle(),
-	            booking.getUserBean().getName(),
+	            booking.getHouse().getTitle(),
+	            booking.getUser().getName(),
 	            DateUtils.formatDate(booking.getBookingDate()),
 	            DateUtils.formatTime(booking.getStartTime()),
 	            DateUtils.formatTime(booking.getEndTime()),

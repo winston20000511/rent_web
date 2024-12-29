@@ -7,8 +7,8 @@ import java.util.logging.Logger;
 import org.hibernate.Session;
 
 import Bean.AdBean;
-import Bean.AdViewBean;
 import IMPL.AdBeanDaoImpl;
+import dto.AdDetailResponseDTO;
 
 public class AdService {
 	
@@ -26,7 +26,7 @@ public class AdService {
 	 * @param receivedData
 	 * @return
 	 */
-	public List<AdViewBean> getFilteredAds(List<String> receivedData) {
+	public List<AdDetailResponseDTO> getFilteredAds(List<String> receivedData) {
 		
 //		logger.info("get filtered ads: " + receivedData.toString());
 		
@@ -100,7 +100,7 @@ public class AdService {
 	 * @param receivedData
 	 * @return
 	 */
-	public AdViewBean getAdDetails(List<String> receivedData) {
+	public AdDetailResponseDTO getAdDetails(List<String> receivedData) {
 		
 		logger.info(receivedData.toString());
 		
@@ -113,7 +113,7 @@ public class AdService {
 	 * @param receivedData
 	 * @return
 	 */
-	public AdViewBean updateAdDetails(List<String> receivedData) {
+	public AdDetailResponseDTO updateAdDetails(List<String> receivedData) {
 		
 		logger.info(receivedData.toString());
 		
@@ -140,16 +140,16 @@ public class AdService {
 	 * @param adBean
 	 * @return
 	 */
-	private AdViewBean setAdView(AdBean adBean) {
-		AdViewBean adView = new AdViewBean();
+	private AdDetailResponseDTO setAdView(AdBean adBean) {
+		AdDetailResponseDTO adView = new AdDetailResponseDTO();
 		adView.setAdId(adBean.getAdId());
-//		adView.setUserId(adBean.getUserId());
 		adView.setUserId((long)(adBean.getUser().getUserId()));
 		adView.setUserName(adBean.getUser().getName());
-		adView.setHouseId(adBean.getHouseId());
-		adView.setAdType(adBean.getAdtype().getAdName());
+		adView.setHouseId(adBean.getHouse().getHouseId());
+		adView.setHouseTitle(adBean.getHouse().getTitle());
+		adView.setAdtypeName(adBean.getAdtype().getAdName());
 		adView.setAdPrice(adBean.getAdPrice());
-//		adView.setSubtotal(null);
+		adView.setSubtotal(null);
 		adView.setIsPaid(adBean.getIsPaid());
 		adView.setOrderId(adBean.getOrderId());
 		adView.setPaidDate(adBean.getPaidDate());
@@ -162,14 +162,14 @@ public class AdService {
 	 * @param adBeanList
 	 * @return
 	 */
-	private List<AdViewBean> setAdsView(List<AdBean> adBeanList) {
-		List<AdViewBean> adsView = new ArrayList<AdViewBean>();
+	private List<AdDetailResponseDTO> setAdsView(List<AdBean> adBeanList) {
+		List<AdDetailResponseDTO> responseDTOs = new ArrayList<AdDetailResponseDTO>();
 		for(AdBean adBean : adBeanList) {
-			AdViewBean adView = setAdView(adBean);
-			adsView.add(adView);
+			AdDetailResponseDTO responseDTO = setAdView(adBean);
+			responseDTOs.add(responseDTO);
 		}
 		
-		return adsView;
+		return responseDTOs;
 	}
 
 }

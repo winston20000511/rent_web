@@ -27,12 +27,6 @@ public class AdBean {
 	@Column(name= " ad_id")
 	private Long adId;
 	
-//	@Column(name = "user_id")
-//	private Long userId;
-	
-	@Column(name = "house_id")
-	private Long houseId;
-	
 	@Column(name = "ad_price")
 	private Integer adPrice;
 	
@@ -61,7 +55,12 @@ public class AdBean {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonIgnore
-    private UserBean user;
+    private UserTableBean user;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "house_id")
+    @JsonIgnore
+    private HouseTableBean house;
 
 	public AdBean() {
 	}
