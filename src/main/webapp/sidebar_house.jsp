@@ -6,17 +6,24 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>房屋管理</title>
+<title>房屋管理系統</title>
+<%-- log --%>
+<link rel="Rent icon" href="./imags/lpoqq-yg0x4-001.ico">
+<%-- datatables --%>
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
+<%-- Bootstrap CSS --%>
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-	rel="stylesheet" />
-<link
-	href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.min.css"
-	rel="stylesheet" />
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
-	rel="stylesheet" />
+	rel="stylesheet"
+	data-integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+	data-crossorigin="anonymous" />
+<%-- Bootstrap Icons --%>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+<%-- CSS --%>
 <link rel="stylesheet" type="text/css" href="CSS/backstage.css">
+<link rel="stylesheet" type="text/css" href="CSS/house.css">
 </head>
 
 <body>
@@ -69,42 +76,34 @@
 		</div>
 
 		<div class="content">
-			<h1>房屋管理</h1>
-			<table class="table table-bordered" id="houseTable">
-				<thead>
-					<tr>
-						<th>房屋ID</th>
-						<th>照片</th>
-						<th>房屋標題</th>
-						<th>屋主ID</th>
-						<th>屋主Email</th>
-						<th>屋主姓名</th>
-						<th>地址</th>
-						<th>價格</th>
-						<th>狀態</th>
-						<th>操作</th>
-					</tr>
-				</thead>
-				<tbody id="tableBody"></tbody>
-			</table>
-		</div>
-
-		<div class="modal fade" id="viewModal" tabindex="-1"
-			aria-labelledby="viewModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-lg">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="viewModalLabel">查看房屋詳細信息</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="modal"
-							aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<div id="houseDetails"></div>
-						<button id="editButton" class="btn btn-warning mt-3">編輯</button>
-					</div>
+			<div class="content">
+				<div class="Content">
+					<div class="Content">
+				<h1>房屋管理</h1>
+				<div class="refresh-container">
+					<button class="refresh-btn" onclick="refreshTable()">重新刷新表格</button>
 				</div>
+
+				<table id="houseTable" class="display">
+					<thead>
+						<tr>
+							<th>房屋編號</th>
+							<th>房屋照片</th>
+							<th>標題</th>
+							<th>價格</th>
+							<th>地址</th>
+							<th>擁有者名稱</th>
+							<th>電子郵件</th>
+							<th>狀態</th>
+						</tr>
+					</thead>
+				</table>
 			</div>
 		</div>
+		</div>
+
+
+	</div>
 	</div>
 
 	<div id="settingsModal" class="modal">

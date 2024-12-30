@@ -38,7 +38,7 @@ public class BackstageLoginServlet extends HttpServlet {
 	        HttpSession session = request.getSession(true);
 	        session.setAttribute("admin", admin);
 	        session.setAttribute("role", admin.getRole());
-	        session.setMaxInactiveInterval(600);
+//	        session.setMaxInactiveInterval(600);
 
 	        response.sendRedirect("backstage-panel.jsp");
 	    } else {
