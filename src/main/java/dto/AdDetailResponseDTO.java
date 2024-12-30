@@ -15,10 +15,15 @@ public class AdDetailResponseDTO {
 	private Long houseId;
 	private String houseTitle;
 	private String adtypeName;
-	private Integer subtotal;
-	private Integer adPrice;
-	private Boolean isPaid;
+//	private Integer subtotal;
+//	private Integer adPrice;
+	private String isPaid;
 	private String orderId;
 	private ZonedDateTime paidDate;
+	private ZonedDateTime expiryDate;
 	
+	public void setIsPaid(Boolean isPaid) {
+		if(isPaid) this.isPaid = "已付款";
+		else this.isPaid = "未付款";
+	}
 }

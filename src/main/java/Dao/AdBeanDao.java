@@ -10,20 +10,14 @@ public interface AdBeanDao {
 	boolean createAdBean(AdBean adBean) throws SQLException;
 	
 	List<AdBean> getAllAdBeans();
-	AdBean getAdBeanByAdId(Integer adId);
-	List<AdBean> getAdBeansByUserId(Integer userId);
-	List<AdBean> getAdBeansByHouseId(Integer houseId);
-	List<AdBean> getAdBeansByIsPaid(Boolean isPaid);
-	List<AdBean> getAdBeanByAdIdAndIsPaid(Integer adId, Boolean isPaid);
-	List<AdBean> getAdBeansByHouseIdAndIsPaid(Integer houseId, Boolean isPaid);
-	List<AdBean> getAdBeansByUserIdAndIsPaid(Integer userId, Boolean isPaid);
-	List<AdBean> getAdBeansByOrderId(String orderId);
+	List<AdBean> filterAds(String searchCondition, String paidCondition, String input);
+	AdBean checkAdDetails(Long adId);
 	
 	List<AdBean> getCanceledAdBeans();
 	
 	boolean updateAdBean(AdBean adBean);
-	AdBean updateAdBeanOnAdTypeAndPrice(Integer adid, Integer adtypeId);
+	AdBean updateAdBeanOnAdTypeAndPrice(Long adId, Integer adtypeId);
 	
-	boolean deleteAdBeanByAdId(Integer adId);
+	boolean deleteAdBeanByAdId(Long adId);
 	
 }

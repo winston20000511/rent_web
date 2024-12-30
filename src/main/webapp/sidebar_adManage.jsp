@@ -83,26 +83,26 @@
 				<div class="Content">
 					<div class="Content">
 						<h1>廣告管理</h1>
-						<div class="search-box">
+						<div>
 							<label class="select-box-label"> <select
 								name="searchCondition" id="search-condition">
-									<option value="all">所有廣告</option>
+									<option value="all" selected>所有訂單</option>
 									<option value="adId">廣告編號</option>
 									<option value="userId">屋主編號</option>
 									<option value="houseId">房屋編號</option>
 							</select>
 							</label> <label class="select-box-label"> <input type="text"
-								name="searchInput" id="search-inupt-box"
-								placeholder="請輸入編號" /><select name="paidCondition"
-								id="paid-condition">
-									<option value="" disabled selected>付款狀況</option>
-									<option value="all">顯示全部</option>
-									<option value="paid">已付款</option>
-									<option value="unpaid">未付款</option>
+								name="searchInput" id="search-input-box" style="display: none" />
+							</label> <label class="select-box-label"> <select
+								name="orderStatus" id="paid-condition">
+									<option value="" disabled selected>廣告狀況</option>
+									<option value="all" selected>顯示全部</option>
+									<option value="1">已付款</option>
+									<option value="0">未付款</option>
 							</select>
 							</label>
-							<button id="search" class="btn" type="button">搜尋</button>
 
+							<button id="search" class="btn" type="button">搜尋</button>
 						</div>
 
 
@@ -128,74 +128,66 @@
 										<td class="user-name"></td>
 										<td class="house-id"></td>
 										<td class="ad-type"></td>
-										<td class="ad-quantity"></td>
 										<td class="is-paid"></td>
+										<td></td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
 
-						<div class="ad-details-box">
-							<h5>廣告詳細資料</h5>
-							<table id="ad-details-table">
-								<tbody>
-									<tr>
-										<th>廣告編號</th>
-										<td class="ad-id"></td>
-									</tr>
-									<tr>
-										<th>用戶編號</th>
-										<td class="user-id"></td>
-									</tr>
-									<tr>
-										<th>用戶姓名</th>
-										<td class="user-name"></td>
-									</tr>
-									<tr>
-										<th>房屋編號</th>
-										<td class="house-id"></td>
-									</tr>
-									<th>廣告天期</th>
-									<td class="ad-type"></td>
-									</tr>
-									<tr>
-										<th>廣告單價</th>
-										<td class="ad-price"></td>
-									</tr>
-									<tr>
-										<th>折扣</th>
-										<td class="ad-coupon"></td>
-									</tr>
-									<th>小計</th>
-									<td class="ad-price-subtotal"></td>
-									</tr>
-									<tr>
-										<th>付款狀態</th>
-										<td class="is-paid"></td>
-									</tr>
-									<tr>
-										<th>訂單號碼</th>
-										<td class="order-id"></td>
-									</tr>
-									<tr>
-										<th>付款日期</th>
-										<td class="paid-date"></td>
-									</tr>
-									<tr>
-										<th>到期日期</th>
-										<td class="expires-at"></td>
-									</tr>
-								</tbody>
-							</table>
+						<div id="ad-details-modal" class="modal">
+							<div class="modal-content">
+								<h5 style="text-align: center;">廣告詳細資料</h5>
+								<table id="ad-details-table">
+									<tbody>
+										<tr>
+											<th>廣告編號</th>
+											<td class="ad-id"></td>
+										</tr>
+										<tr>
+											<th>用戶編號</th>
+											<td class="user-id"></td>
+										</tr>
+										<tr>
+											<th>用戶姓名</th>
+											<td class="user-name"></td>
+										</tr>
+										<tr>
+											<th>房屋編號</th>
+											<td class="house-id"></td>
+										</tr>
+										<tr>
+											<th>廣告天期</th>
+											<td class="ad-type"></td>
+										</tr>
+										<tr>
+											<th>付款狀態</th>
+											<td class="is-paid"></td>
+										</tr>
+										<tr>
+											<th>訂單號碼</th>
+											<td class="order-id"></td>
+										</tr>
+										<tr>
+											<th>付款日期</th>
+											<td class="paid-date"></td>
+										</tr>
+										<tr>
+											<th>到期日期</th>
+											<td class="expires-at"></td>
+										</tr>
+									</tbody>
+								</table>
 
-							<div class="button-box">
-								<button type="button" class="modify btn">修改資料</button>
-								<button type="button" class="cancel btn">取消修改</button>
-								<button type="button" class="submit btn">確認送出</button>
-								<button type="button" class="leave btn">結束</button>
+								<div class="button-box">
+									<button type="button" class="modify btn">修改資料</button>
+									<button type="button" class="cancel btn cancel-ad">取消修改</button>
+									<button type="button" class="submit btn">確認送出</button>
+									<button type="button" class="leave btn">結束</button>
+								</div>
 							</div>
-
 						</div>
+
 
 					</div>
 				</div>

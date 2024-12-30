@@ -4,18 +4,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import org.hibernate.Session;
 
+import com.example.demo.dto.AdDetailsResponseDTO;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import Dao.AdService;
-import dto.AdDetailResponseDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -24,10 +23,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import util.HibernateUtil;
 import util.ZonedDateAdapter;
 
-@WebServlet("/AdFilterServlet.do")
-public class AdFilterServlet extends HttpServlet {
+/**
+ * Servlet implementation class OrderCheckDetailsServlet
+ */
+@WebServlet("/CancelAdServlet.do")
+public class CancelAdServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Logger logger = Logger.getLogger(AdFilterServlet.class.getName());
+	private Logger logger = Logger.getLogger(CancelAdServlet.class.getName());
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -55,24 +57,22 @@ public class AdFilterServlet extends HttpServlet {
 				requestJson.append(line);
 			}
 
-			logger.info("requestJson order update/cancel:" + requestJson.toString());
-			// {"condition":"","orderStatus":"","input":""}
+			logger.info("requestJson ad to be canceled " + requestJson.toString());
 			
 			Gson gson = new GsonBuilder().registerTypeAdapter(ZonedDateTime.class, new ZonedDateAdapter()).create();
-			Map<String, Object> filterParams = gson.fromJson(requestJson.toString(), new TypeToken<Map<String, Object>>() {}.getType());
-			logger.info("received data: " + filterParams);
+			Map<String, Object> params = gson.fromJson(requestJson.toString(), new TypeToken<Map<String, Object>>() {}.getType());
+			logger.info("received data: " + params);
 			
 			AdService adService = new AdService(session);
 			String jsonResponse = null;
 
-			// Debugging
-			logger.info("Parsed filterParams: " + filterParams);
-
-			// 調用orderService的方法
-			List<AdDetailResponseDTO> ads = adService.filterAds(filterParams);
-			logger.info("拿出來的ads們: " + ads);
+			// 調用adService的方法
+			Double adIdDouble = (Double) params.get("adId");
+			Long adIdLong = adIdDouble.longValue();
+			boolean result = adService.deleteAd(adIdLong);
+			logger.info("delte 是否成功刪除: " + result);
 			
-			jsonResponse = gson.toJson(ads);
+			jsonResponse = gson.toJson(result);
 			
 			out.write(jsonResponse);
 			session.getTransaction().commit();

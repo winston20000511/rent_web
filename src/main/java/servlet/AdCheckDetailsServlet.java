@@ -24,10 +24,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import util.HibernateUtil;
 import util.ZonedDateAdapter;
 
-@WebServlet("/AdFilterServlet.do")
-public class AdFilterServlet extends HttpServlet {
+@WebServlet("/AdCheckDetailsServlet.do")
+public class AdCheckDetailsServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Logger logger = Logger.getLogger(AdFilterServlet.class.getName());
+	private Logger logger = Logger.getLogger(AdCheckDetailsServlet.class.getName());
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -66,13 +66,13 @@ public class AdFilterServlet extends HttpServlet {
 			String jsonResponse = null;
 
 			// Debugging
-			logger.info("Parsed filterParams: " + filterParams);
+			logger.info("Parsed check ad id: " + filterParams);
 
 			// 調用orderService的方法
-			List<AdDetailResponseDTO> ads = adService.filterAds(filterParams);
-			logger.info("拿出來的ads們: " + ads);
+			AdDetailResponseDTO ad = adService.checkAdDetails(filterParams);
+			logger.info("拿出來的ad: " + ad);
 			
-			jsonResponse = gson.toJson(ads);
+			jsonResponse = gson.toJson(ad);
 			
 			out.write(jsonResponse);
 			session.getTransaction().commit();

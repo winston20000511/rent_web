@@ -35,11 +35,11 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 
 	    // 根據 searchCondition 和 input 添加條件
 	    if (searchCondition != null && input != null && !input.isEmpty()) {
-	        if ("merchantTradNo".equals(searchCondition)) {
+	        if (searchCondition.equals("merchantTradNo")) {
 	        	hqlstr.append(hasCondition ? " AND " : " WHERE ");
 	        	hqlstr.append("o.merchantTradNo LIKE :input ");
 	        	hasCondition = true;
-	        } else if ("userId".equals(searchCondition)) {
+	        } else if (searchCondition.equals("userId")) {
 	        	hqlstr.append(hasCondition ? " AND " : " WHERE ");
 	        	hqlstr.append("CAST(o.userId AS string) LIKE :input ");
 	        	hasCondition = true;

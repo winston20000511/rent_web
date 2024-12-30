@@ -329,6 +329,7 @@ function setupAdInfoForOrderDetailsModal(orderDetails) {
 
 // 開關篩選欄位
 const searchInput = document.getElementById("search-input-box");
+console.log("篩選input: " + searchInput)
 function toggleSearchInput() {
 	if (searchInput.style.display === "none" || searchInput.style.display === "") {
 		searchInput.style.display = "block";

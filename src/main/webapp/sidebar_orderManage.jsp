@@ -61,7 +61,7 @@
 					href="sidebar_booking.jsp" data-content="sidebar_booking">預約管理系統<span
 						class="bi bi-caret-right-fill caret-icon"></span></a></li>
 				<li><a class="bi bi-badge-ad" href="sidebar_adManage.jsp"
-					data-content="sidebar_adOrder">VIP服務物件管理系統<span
+					data-content="sidebar_adOrder">廣告管理系統<span
 						class="bi bi-caret-right-fill caret-icon"></span></a></li>
 				<li><a class="bi bi-wallet" href="sidebar_orderManage.jsp"
 					data-content="sidebar_settings">訂單管理系統<span
@@ -129,7 +129,7 @@
 
 						<div id="order-details-modal" class="modal">
 							<div class="modal-content">
-								<h5>訂單詳細資料</h5>
+								<h5 style="text-align: center;">訂單詳細資料</h5>
 								<table id="order-details">
 									<tbody>
 										<tr>
