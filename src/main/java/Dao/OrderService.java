@@ -1,5 +1,7 @@
 package Dao;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +56,13 @@ public class OrderService {
 		return orderDetailDTOs;
 	}
 
+	
+	public OrderDetailsResponseDTO checkOutOrderDetails(String orderId) {
+		OrderBean order = orderBeanDao.getOrderBeanByTradNo(orderId);
+		logger.info("訂單中的廣告資料: " + order.getAds().toString());
+		return setupOrderDetailDTO(order);
+	}
+	
 	/**
 	 * 更新訂單狀態，變成取消 receivedData = ["canceled", "tradeNo"]
 	 * @param receivedData
@@ -74,6 +83,54 @@ public class OrderService {
 		return orderTableData;
 	}
 	
+	
+	private OrderDetailsResponseDTO setupOrderDetailDTO(OrderBean order) {
+		
+		List<Long> houseIds = new ArrayList<>();
+		List<String> houseTitles = new ArrayList<>();
+		List<Long> adIds = new ArrayList<>();
+		List<Long> adCouponApplied = new ArrayList<>();
+		List<Integer> adtypes = new ArrayList<>();
+		List<Integer> adOriginalPrice = new ArrayList<>();
+		List<Integer> adDiscounts = new ArrayList<>();
+		List<String> adPeriods = new ArrayList<>();
+		
+		OrderDetailsResponseDTO detailDTO = new OrderDetailsResponseDTO();
+		
+		detailDTO.setUserId(order.getUserId());
+		detailDTO.setUserName(order.getUser().getName());
+		detailDTO.setOrderId(order.getMerchantTradNo());
+		detailDTO.setPaidDate(TimeForm.convertZonedDateTimeToString(order.getMerchantTradDate()));
+		detailDTO.setPaymentMethod(order.getChoosePayment());
+		detailDTO.setOrderStatus(order.getOrderStatus());
+		detailDTO.setTotalAmount(order.getTotalAmount());
+		
+		List<AdBean> ads = order.getAds();
+		for(AdBean ad : ads) {
+			houseIds.add(ad.getHouse().getHouseId());
+			houseTitles.add(ad.getHouse().getTitle());
+			adIds.add(ad.getAdId());
+			adOriginalPrice.add(ad.getAdPrice()); // 資料庫要存原價哦!!! 記得前後都要改
+			String adtypeName = ad.getAdtype().getAdName();
+			adtypes.add(adtypeName);
+			adPeriods.add(calculateAdPeriodStr(order.getMerchantTradDate(), adtypeName));
+			
+			// 如果 coupno 為 1 = 有使用
+			if(ad.getIsCouponUsed() == 1) {
+				adCouponApplied.add(ad.getAdId());
+			}
+		}
+		
+		detailDTO.setHouseIds(houseIds);
+		detailDTO.setHouseTitles(houseTitles);
+		detailDTO.setAdIds(adIds);
+		detailDTO.setAdCouponApplied(adCouponApplied);
+		detailDTO.setAdPrices(adPrices);
+		detailDTO.setAdtypes(adtypes);
+		detailDTO.setAdPeriods(adPeriods);
+
+		return detailDTO;
+	}
 	
 	private List<OrderDetailsResponseDTO> setupOrderDetailDTOs(List<OrderBean> orders) {
 		List<OrderDetailsResponseDTO> orderDetails = new ArrayList<>();
@@ -123,6 +180,15 @@ public class OrderService {
 	        logger.severe("型別轉換錯誤");
 	        logger.severe(exception.getMessage());
 	    }
+	}
+	
+	private String calculateAdPeriodStr(ZonedDateTime paidDate, String adtype) {
+		
+		// 30天
+		
+		// 60天
+		
+		return null;
 	}
 	
 }

@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -24,10 +23,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import util.HibernateUtil;
 import util.ZonedDateAdapter;
 
-@WebServlet("/OrderDataOperationServlet.do")
-public class OrderDataOperationServlet extends HttpServlet {
+/**
+ * Servlet implementation class OrderCheckDetailsServlet
+ */
+@WebServlet("/OrderCheckDetailsServlet.do")
+public class OrderCheckDetailsServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Logger logger = Logger.getLogger(OrderDataOperationServlet.class.getName());
+	private Logger logger = Logger.getLogger(OrderCheckDetailsServlet.class.getName());
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -60,24 +62,20 @@ public class OrderDataOperationServlet extends HttpServlet {
 				requestJson.append(line);
 			}
 
-			logger.info("requestJson order update/cancel:" + requestJson.toString());
-			// {"condition":"","orderStatus":"","input":""}
+			logger.info("requestJson order check out: " + requestJson.toString());
 			
 			Gson gson = new GsonBuilder().registerTypeAdapter(ZonedDateTime.class, new ZonedDateAdapter()).create();
-			Map<String, Object> filterParams = gson.fromJson(requestJson.toString(), new TypeToken<Map<String, Object>>() {}.getType());
-			logger.info("received data: " + filterParams);
+			Map<String, Object> params = gson.fromJson(requestJson.toString(), new TypeToken<Map<String, Object>>() {}.getType());
+			logger.info("received data: " + params);
 			
 			OrderService orderService = new OrderService(session);
 			String jsonResponse = null;
 
-			// Debugging
-			logger.info("Parsed filterParams: " + filterParams);
-
 			// 調用orderService的方法
-			List<OrderDetailsResponseDTO> orders = orderService.filterOrders(filterParams);
-			logger.info("拿出來的order們: " + orders);
+			OrderDetailsResponseDTO responseDTO = orderService.checkOutOrderDetails((String)params.get("orderId"));
+			logger.info("check out 取得的order: " + responseDTO);
 			
-			jsonResponse = gson.toJson(orders);
+			jsonResponse = gson.toJson(responseDTO);
 			
 			out.write(jsonResponse);
 			session.getTransaction().commit();

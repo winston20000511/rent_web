@@ -11,7 +11,7 @@ initOrderTable();
 
 function initOrderTable() {
   $.ajax({
-    url: `${baseUrl}/OrderDataOperationServlet.do`,
+    url: `${baseUrl}/OrderFilterServlet.do`,
     type: "post",
     dataType: "json",
     contentType: "application/json",
@@ -70,12 +70,11 @@ function initDynamicButtonEvents(){
   // 查看詳細
   $("#ordertable").on("click", ".details-btn", function(){
     const orderId = $(this).data("id");
-    console.log("查看詳細，訂單ID: ", orderId);
-    viewOrderDetail(orderId);
+    viewOrderDetails(orderId);
   });
 
   // 刪除訂單
-  $("#ordertable").on("click", "delete-btn", function(){
+  $("#ordertable").on("click", ".delete-btn", function(){
     const orderId = $(this).data("id");
     console.log("取消訂單，訂單ID: ", orderId);
     cancelOrder(orderId);
@@ -83,12 +82,50 @@ function initDynamicButtonEvents(){
 };
 
 // 查看訂單詳細
+const orderDetailsBox = document.getElementById("order-details-box");
 function viewOrderDetails(orderId){
+
+  const param = {
+    "orderId" : orderId,
+  };
+
   console.log("查看訂單詳細 ID: ", orderId);
+
+  $.ajax({
+    url: `${baseUrl}/OrderCheckDetailsServlet.do`,
+    type: "post",
+    dataType: "json",
+    contentType: "application/json",
+    data: JSON.stringify(param),
+    success: function (orderDetails) {
+      console.log("訂單詳細資料: ", orderDetails);
+      setupOrderDetailsModal(orderDetails);
+    },
+  });
 };
 
 function cancelOrder(orderId){
   console.log("取消訂單 ID: ", orderId);
+}
+
+// 設置 order detail modal
+function setupOrderDetailsModal(orderDetails){
+  orderDetails.adIds.forEach((adId, index) =>{
+    const tr = document.createElement("tr");
+
+    const houseIdTd = document.createElement("td");
+    houseIdTd.textContent = orderDetails[index] || "";
+    tr.appendChild(houseIdTd);
+
+    const adIdTd = document.createElement("td");
+    adIdTd.textContent = adId || "";
+    tr.appendChild(adIdTd);
+
+    const adtypeTd = document.createElement("td");
+    adtypeTd.textContent = orderDetails.adtypes[index] || "";
+    tr.appendChild(adtypeTd);
+
+  })
 }
 
 
@@ -117,16 +154,16 @@ searchConditionSelection.addEventListener("change", function(){
   
   if(searchConditionSelection.value === "merchantTradNo"){
     searchInput.style.display = "block";
-    searchInput.ariaPlaceholder = "請輸入訂單編號";
+    searchInput.placeholder = "請輸入訂單編號";
   }
   
   if(searchConditionSelection.value === "userId"){
     searchInput.style.display = "block";
-    searchInput.ariaPlaceholder = "請輸入屋主編號";
+    searchInput.placeholder = "請輸入屋主編號";
   }
 
   if(searchConditionSelection.value === "all"){
-    searchInput.ariaPlaceholder = "";
+    searchInput.placeholder = "";
     searchInput.style.display = "none";
   }
 
@@ -148,7 +185,7 @@ async function filterOrders() {
   console.log("執行篩選參數: ", filteredParams);
 
   $.ajax({
-    url: `${baseUrl}/OrderDataOperationServlet.do`,
+    url: `${baseUrl}/OrderFilterServlet.do`,
     type: "post",
     dataType: "json",
     contentType: "application/json",

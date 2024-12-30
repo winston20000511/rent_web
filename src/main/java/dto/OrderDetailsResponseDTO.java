@@ -15,12 +15,16 @@ public class OrderDetailsResponseDTO {
 	private String userName;
 	private String paymentMethod;
 	private String orderStatus;
-	private String adPeriod;
+	private Long totalAmount;
 	
 	private List<Long> houseIds;
 	private List<String> houseTitles;
 	private List<Long> adIds;
+	private List<Long> adCouponApplied; // 存有 coupn 的 ad id
 	private List<String> adtypes;
+	private List<Integer> adOriginalPrice;
+	private List<Integer> adDiscounts;
+	private List<String> adPeriods;
 
 	public void setOrderStatus(Short orderStatus) {
 		if(orderStatus == (short)0) this.orderStatus = "已取消";

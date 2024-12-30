@@ -91,14 +91,14 @@ button {
 }
 
 /* order details - css*/
-.order-details-box{
+#order-details-modal{
 	margin-top: 8px;
 	border-top: 2px solid #343a40;
 	padding: 5px 0;
    	display: none;
 }
 
-.order-details-box>h5 {
+#order-details-modal>h5 {
 	text-align: center;
 }
 

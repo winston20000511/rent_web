@@ -29,8 +29,6 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 	@Override
 	public List<OrderBean> filterOrders(String searchCondition, String orderStatus, String input) {
 	    
-		logger.info("有進來");
-		
 		StringBuilder hqlstr = new StringBuilder("FROM OrderBean o ");
 		
 		boolean hasCondition = false;
@@ -38,12 +36,10 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 	    // 根據 searchCondition 和 input 添加條件
 	    if (searchCondition != null && input != null && !input.isEmpty()) {
 	        if ("merchantTradNo".equals(searchCondition)) {
-	        	logger.info("選到merchantTradNo，加進去");
 	        	hqlstr.append(hasCondition ? " AND " : " WHERE ");
 	        	hqlstr.append("o.merchantTradNo LIKE :input ");
 	        	hasCondition = true;
 	        } else if ("userId".equals(searchCondition)) {
-	        	logger.info("選到userId，加進去");
 	        	hqlstr.append(hasCondition ? " AND " : " WHERE ");
 	        	hqlstr.append("CAST(o.userId AS string) LIKE :input ");
 	        	hasCondition = true;
@@ -52,7 +48,6 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 
 	    // 根據 orderStatus 添加條件
 	    if (!orderStatus.equals("all")) {
-	    	logger.info("orderStatus不是all，加進去");
 	    	hqlstr.append(hasCondition ? " AND " : " WHERE ");
 	        hqlstr.append("o.orderStatus = :orderStatus ");
 	    }
@@ -64,18 +59,15 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 
 	    if (searchCondition != null && input != null && !input.isEmpty()) {
 	    	if(searchCondition.equals("merchantTradNo")) {
-	    		logger.info("驗證search condition是訂單號碼");
 	    		query.setParameter("input", "%" + input + "%");
 	    	}
 	    	
 	    	if(searchCondition.equals("userId")) {
-	    		logger.info("驗證search condition是使用者編號");
 	    		query.setParameter("input", "%" + input + "%");
 	    	}
 	    }
 
 	    if (!orderStatus.equals("all")) {
-	    	logger.info("order status 有條件");
 	        query.setParameter("orderStatus", orderStatus);
 	    }
 
@@ -88,32 +80,31 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 
 
 	@Override
-	public OrderDetailsResponseDTO getOrderAdCombinedDataByTradNo(String tradNo){
-	    String hqlstr = "select o.userid, o.merchanttradno, o.merchanttraddate, "
-                + "o.choosepayment, o.orderstatus, o.totalamount, "
-                + "a.username, a.houseid, a.adid, a.adtype, "
-                + "a.adduration, a.adprice, a.quantity "
-                + "from OrderBean o join o.ads a "
-                + "where o.merchanttradno = :merchanttradno";
+	public OrderDetailsResponseDTO getOrderAdCombinedDataByTradNo(String orderId){
+		String hqlstr = "select o.merchantTradNo, o.merchantTradDate, o.choosePayment, "
+	              + "o.orderStatus, o.totalAmount, o.user.userName, "
+	              + "a.adId, a.adtype, a.adPrice "
+	              + "from OrderBean o join o.ads a "
+	              + "where o.merchantTradNo = :orderId";
 	    
 	    Query<OrderDetailsResponseDTO> query = session.createQuery(hqlstr, OrderDetailsResponseDTO.class);
-	    query.setParameter("merchanttradno", tradNo);
+	    query.setParameter("merchantTradNo", orderId);
 
 	    return query.getSingleResult();
 	}
 
 
 	@Override
-	public OrderBean cancelOrderStatusByTradNo(String tradNo) {
-		OrderBean orderBean = getOrderBeanByTradNo(tradNo);
+	public OrderBean cancelOrderStatusByTradNo(String orderId) {
+		OrderBean orderBean = getOrderBeanByTradNo(orderId);
 		orderBean.setOrderStatus((short)0);
 		return orderBean;
 	}
 
 	@Override
-	public OrderBean getOrderBeanByTradNo(String tradeNo) {
-		Query<OrderBean> query = session.createQuery("from OrderBean where merchanttradno=:merchanttradno", OrderBean.class);
-		query.setParameter("merchanttradno", tradeNo);
+	public OrderBean getOrderBeanByTradNo(String orderId) {
+		Query<OrderBean> query = session.createQuery("from OrderBean where merchantTradNo=:merchantTradNo", OrderBean.class);
+		query.setParameter("merchantTradNo", orderId);
 		return query.getSingleResult();
 	}
 
