@@ -7,8 +7,9 @@ import DTO.HouseSimpleInfoDTO;
 
 public interface houseDAO {
 	
-	boolean updateHouseDetailsWithoutImageAndUser(Long houseId, HouseDetailsDTO houseDetails);
     List<HouseSimpleInfoDTO> getPaginatedHouseList(int page, int pageSize, String keyword);
-    HouseDetailsDTO getHouseDetailsById(Long houseId);
+
     byte[] getSmallestImageByHouseId(Long houseId);
+    int getTotalRecordCount(String keyword);
+    boolean updateHouseStatus(Long houseId, byte status);
 }
