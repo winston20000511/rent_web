@@ -47,7 +47,7 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 	    }
 
 	    // 根據 orderStatus 添加條件
-	    if (!orderStatus.equals("all")) {
+	    if (orderStatus != null && !orderStatus.equals("all") && !orderStatus.isEmpty()) {
 	    	hqlstr.append(hasCondition ? " AND " : " WHERE ");
 	        hqlstr.append("o.orderStatus = :orderStatus ");
 	    }
@@ -67,10 +67,10 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 	    	}
 	    }
 
-	    if (!orderStatus.equals("all")) {
+	    if (orderStatus != null && !orderStatus.isEmpty() && !orderStatus.equals("all")) {
 	        query.setParameter("orderStatus", orderStatus);
 	    }
-
+	    
 	    // 返回結果
 	    List<OrderBean> resultList = query.getResultList();
 	    return resultList;

@@ -28,70 +28,8 @@ public class AdService {
 	 */
 	public List<AdDetailResponseDTO> getFilteredAds(List<String> receivedData) {
 		
-//		logger.info("get filtered ads: " + receivedData.toString());
+		logger.info("get filtered ads: " + receivedData.toString());
 		
-		List<AdBean> adBeanList = new ArrayList<AdBean>();
-
-		// 沒有使用者輸入時
-		if (receivedData.get(3).equals("")) {
-			// 找已付款
-			if (receivedData.get(2).equals("paid")) {
-				adBeanList = adBeanDao.getAdBeansByIsPaid(true);
-			} else if (receivedData.get(2).equals("unpaid")) {
-				// 找未付款
-				adBeanList = adBeanDao.getAdBeansByIsPaid(false);
-			} else {
-				// 已付跟未付都找
-				adBeanList = adBeanDao.getAllAdBeans();
-			}
-			
-			return setAdsView(adBeanList);
-		}
-
-		
-		// 選擇輸入為 adId 時
-		if (receivedData.get(1).equals("adId")) {
-			// 有付款/沒付款 + user id
-			if (receivedData.get(2).equals("paid")) {
-				adBeanList = adBeanDao.getAdBeanByAdIdAndIsPaid(Integer.parseInt(receivedData.get(3)), true);
-			} else if (receivedData.get(2).equals("unpaid")) {
-				adBeanList = adBeanDao.getAdBeanByAdIdAndIsPaid(Integer.parseInt(receivedData.get(3)), false);
-			} else {
-				// 全選 + user id
-				AdBean adBean = adBeanDao.getAdBeanByAdId(Integer.parseInt(receivedData.get(3)));
-				adBeanList.add(adBean);
-			}
-			return setAdsView(adBeanList);
-		}
-
-		// 如果篩選條件 = user id
-		if (receivedData.get(1).equals("userId")) {
-			// 已付/未付 + user id
-			if (receivedData.get(2).equals("paid")) {
-				adBeanList = adBeanDao.getAdBeansByUserIdAndIsPaid(Integer.parseInt(receivedData.get(3)), true);
-			} else if (receivedData.get(2).equals("unpaid")) {
-				adBeanList = adBeanDao.getAdBeansByUserIdAndIsPaid(Integer.parseInt(receivedData.get(3)), false);
-			} else {
-				// all + user id
-				adBeanList = adBeanDao.getAdBeansByUserId(Integer.parseInt(receivedData.get(3)));
-			}
-			return setAdsView(adBeanList);
-		}
-
-		// 如果篩選條件 = house id
-		if (receivedData.get(1).equals("houseId")) {
-			// 已付/未付
-			if (receivedData.get(2).equals("paid")) {
-				adBeanList = adBeanDao.getAdBeansByHouseIdAndIsPaid(Integer.parseInt(receivedData.get(3)), true);
-			} else if (receivedData.get(2).equals("unpaid")) {
-				adBeanList = adBeanDao.getAdBeansByHouseIdAndIsPaid(Integer.parseInt(receivedData.get(3)), false);
-				// 全部 + house id
-			} else {
-				adBeanList = adBeanDao.getAdBeansByHouseId(Integer.parseInt(receivedData.get(3)));
-			}
-			return setAdsView(adBeanList);
-		}
-
 		return null;
 	}
 
