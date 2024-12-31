@@ -1,12 +1,14 @@
 package IMPL;
 
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import Bean.AdBean;
+import Bean.AdtypeBean;
 import Dao.AdBeanDao;
 
 public class AdBeanDaoImpl implements AdBeanDao {
@@ -92,29 +94,6 @@ public class AdBeanDaoImpl implements AdBeanDao {
         return query.getSingleResult();
 	}
 
-	
-	@Override
-	public boolean updateAdBean(AdBean adBean) {
-		try {
-			session.update(adBean);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	@Override
-	public AdBean updateAdBeanOnAdTypeAndPrice(Long adId, Integer adtypeId) {
-//		AdBean adBean = getAdBeanByAdId(adid);
-//		adBean.setAdPrice(adtypeId);
-////		adBean.setAdtypeId(null);
-////		adBean.setAdtype(null);
-//
-//		return adBean;
-		return null;
-	}
-
 	@Override
 	public boolean deleteAdBeanByAdId(Long adId) {
 		try {
@@ -128,10 +107,27 @@ public class AdBeanDaoImpl implements AdBeanDao {
 		}
 	}
 
+
 	@Override
-	public List<AdBean> getCanceledAdBeans() {
-		// TODO Auto-generated method stub
-		return null;
+	public AdBean editAd(Long adId, Integer newAdtypeId) {
+		// 前端取得廣告資訊 + 廣告編號
+		
+		// 取出要修改的廣告
+		String hql = "FROM AdBean a WHERE a.adId = :adId";
+		Query<AdBean> query = session.createQuery(hql, AdBean.class);
+        query.setParameter("adId", adId);
+        AdBean ad = query.getSingleResult();
+
+        // 取出選取的廣告類型
+        String adtypeHql = "From AdtypeBean adt WHERE adt.id = :adtypeId";
+     	Query<AdtypeBean> adtQuery = session.createQuery(adtypeHql, AdtypeBean.class);
+        adtQuery.setParameter("adtypeId", newAdtypeId);
+     	// 送出修改內容
+        AdtypeBean adtype = adtQuery.getSingleResult();
+        ad.setAdtype(adtype);
+        session.saveOrUpdate(ad);
+
+		return ad;
 	}
 
 }

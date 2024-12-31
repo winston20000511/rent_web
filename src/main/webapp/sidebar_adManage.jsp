@@ -181,7 +181,7 @@
 
 								<div class="button-box">
 									<button type="button" class="modify btn">修改資料</button>
-									<button type="button" class="cancel btn cancel-ad">取消修改</button>
+									<button type="button" class="cancel btn">取消修改</button>
 									<button type="button" class="submit btn">確認送出</button>
 									<button type="button" class="leave btn">結束</button>
 								</div>

@@ -99,23 +99,25 @@ function disableCancelButtonsOnDraw() {
 
 // 初始化動態按鈕
 function initDynamicButtonEvents() {
-	$("#ordertable").on("click", ".details-btn", function() {
-		const orderId = $(this).data("id");
-		viewOrderDetails(orderId);
-	});
+    $("#ordertable").off("click", ".details-btn").on("click", ".details-btn", function() {
+        const orderId = $(this).data("id");
+        viewOrderDetails(orderId);
+    });
 
-	$("#ordertable").on("click", ".delete-btn", function() {
-		const orderId = $(this).data("id");
-		const orderStatus = $(this).closest("tr").find(".order-status").text();
+    $("#ordertable").off("click", ".delete-btn").on("click", ".delete-btn", function() {
+        const orderId = $(this).data("id");
+        const orderStatus = $(this).closest("tr").find(".order-status").text();
 
-		if (orderStatus === "已取消") {
-			disableButton('.cancel-order');
-			return;
-		}
+        if (orderStatus === "已取消") {
+            disableButton('.cancel-order');
+            return;
+        }
 
-		cancelOrder(orderId);
-	});
+        cancelOrder(orderId);
+    });
 }
+
+
 
 const modal = document.getElementById("order-details-modal");
 const closeButton = document.querySelector(".leave");

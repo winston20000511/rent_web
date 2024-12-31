@@ -7,74 +7,86 @@ let filteredParams = {
 	input: "",
 };
 
+let lastFilteredParams = { ...filteredParams };
+
 $(document).ready(function() {
-	initAdTable();
+    initAdTable();
+    document.getElementById("search").addEventListener("click", function() {
+        updateFilterParams();
+        if (JSON.stringify(filteredParams) !== JSON.stringify(lastFilteredParams)) {
+            filterAds();
+            lastFilteredParams = { ...filteredParams };
+        }
+    });
 });
 
 function initAdTable() {
-	if ($.fn.DataTable.isDataTable('#adtable')) {
-		$('#adtable').DataTable().clear().destroy();
-	}
-	$.ajax({
-		url: `${baseUrl}/AdFilterServlet.do`,
-		type: "post",
-		dataType: "json",
-		contentType: "application/json",
-		data: JSON.stringify(filteredParams),
-		success: function(data) {
-			console.log("篩選出來的廣告': ", data);
-			if (!data || data.length === 0) {
-				console.warn("沒有符合篩選條件的廣告資料");
-				return;
-			}
+    if ($.fn.DataTable.isDataTable('#adtable')) {
+        $('#adtable').DataTable().clear().destroy();
+    }
 
-			const table = $("#adtable").DataTable({
-				language: {
-					url: "https://cdn.datatables.net/plug-ins/2.1.8/i18n/zh-HANT.json",
-					info: "",
-				},
-				processing: true,
-				searching: false,
-				pageLength: 20,
-				dom: '<f><t><i><p>', //l:length不使用;控制一次展示幾筆
-				columns: [
-					{ data: "adId" },
-					{ data: "userId" },
-					{ data: "userName" },
-					{ data: "houseId" },
-					{ data: "adtypeName" },
-					{ data: "isPaid" },
-					{ data: "actions" }
-				],
-				columnDefs: [
-					{ adable: false, targets: [4, 6] }
-				]
-			});
+    // 初始請求，這裡會獲得篩選條件為初始的所有廣告資料
+    $.ajax({
+        url: `${baseUrl}/AdFilterServlet.do`,
+        type: "post",
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify(filteredParams),
+        success: function(data) {
+            console.log("篩選出來的廣告: ", data);
 
-			// 更新表格數據
-			table.clear();
-			$.each(data, function(index, ad) {
-				table.row.add({
-					adId: ad.adId || "未提供",
-					userId: ad.userId || "未提供",
-					userName: ad.userName || "未提供",
-					houseId: ad.houseId || "未提供",
-					adtypeName: ad.adtypeName.replace("?", "天") || "未提供",
-					isPaid: ad.isPaid || "未提供",
-					actions: `<button class="details-btn btn btn-warning btn-sm" data-id="${ad.adId}">查看詳細</button>
+            if (!data || data.length === 0) {
+                console.warn("沒有符合篩選條件的廣告資料");
+                return;
+            }
+
+            const table = $("#adtable").DataTable({
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/2.1.8/i18n/zh-HANT.json",
+                    info: "",
+                },
+                processing: true,
+                searching: false,
+                pageLength: 20,
+                dom: '<f><t><i><p>', //l:length不使用;控制一次展示幾筆
+                columns: [
+                    { data: "adId" },
+                    { data: "userId" },
+                    { data: "userName" },
+                    { data: "houseId" },
+                    { data: "adtypeName" },
+                    { data: "isPaid" },
+                    { data: "actions" }
+                ],
+                columnDefs: [
+                    { adable: false, targets: [4, 6] }
+                ]
+            });
+
+            // 更新表格數據
+            table.clear();
+            $.each(data, function(index, ad) {
+                table.row.add({
+                    adId: ad.adId || "未提供",
+                    userId: ad.userId || "未提供",
+                    userName: ad.userName || "未提供",
+                    houseId: ad.houseId || "未提供",
+                    adtypeName: ad.adtypeName.replace("?", "天") || "未提供",
+                    isPaid: ad.isPaid || "未提供",
+                    actions: `<button class="details-btn btn btn-warning btn-sm" data-id="${ad.adId}">查看詳細</button>
                               <button class="delete-btn btn btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModelBox" data-id="${ad.adId}">刪除廣告</button>`
-				});
-			});
+                });
+            });
 
-			table.draw();
-			disableCancelButtonsOnDraw();
-			initDynamicButtonEvents();
-		},
-		error: function(xhr, status, error) {
-			console.error("AJAX Error: ", status, error);
-			console.error("Response Text: ", xhr.responseText);
-		}
-	});
+            table.draw();
+            disableCancelButtonsOnDraw();
+            initDynamicButtonEvents();
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX Error: ", status, error);
+            console.error("Response Text: ", xhr.responseText);
+        }
+    });
 }
 
 
@@ -102,14 +114,14 @@ function disableCancelButtonsOnDraw() {
 
 // 初始化動態按鈕
 function initDynamicButtonEvents() {
-	$("#adtable").on("click", ".details-btn", function() {
+	$("#adtable").off("click", ".details-btn").on("click", ".details-btn", function() {
 		const adId = $(this).data("id");
 		viewAdDetails(adId);
 	});
 
-	$("#adtable").on("click", ".delete-btn", function() {
+	$("#adtable").off("click", ".delete-btn").on("click", ".delete-btn", function() {
 		const adId = $(this).data("id");
-		const isPaid = $(this).closest("tr").find("td:eq(5)").text();
+		const isPaid = $(this).closest("tr").find(".paid-condition").text();
 
 		if (isPaid === "已付款") {
 			disableButton('.modify');
@@ -119,7 +131,6 @@ function initDynamicButtonEvents() {
 		cancelAd(adId);
 	});
 }
-
 
 const modal = document.getElementById("ad-details-modal");
 const closeButton = document.querySelector(".leave");
@@ -137,21 +148,26 @@ function closeModal() {
 // 點擊結束按鈕關閉彈窗
 closeButton.addEventListener("click", closeModal);
 
+// ad detail modal按鈕
+const modifyButton = document.querySelector('.modify');
+const cancelButton = document.querySelector('.cancel');
+const submitButton = document.querySelector('.submit');
 
-function setupModalButtons(adId) {
-	const cancelAdButton = document.querySelector('.modify');
-	cancelAdButton.addEventListener('click', function() {
-		modifyAd(adId);
+function setupModalButtons() {
+	// 編輯
+	modifyButton.addEventListener('click', function() {
+		openEditAd();
 	});
 
-	// 為結束按鈕添加事件監聽
-	const leaveButton = document.querySelector('.leave');
-	leaveButton.addEventListener('click', function() {
+	// 關閉
+	closeButton.addEventListener('click', function() {
 		closeModal();
+		modifyButton.style.display = 'inline-block';
+		cancelButton.style.display = 'none';
+		submitButton.style.display = 'none';
 	});
 }
 
-// 查看廣告詳細
 // 查看廣告詳細
 function viewAdDetails(adId) {
 	const param = {
@@ -202,23 +218,135 @@ function setupAdDetailsModal(adDetails) {
 	document.querySelector(".modify").setAttribute("data-id", adDetails.adId);
 }
 
-function setupModalButtons(adId) {
-	const modifyButton = document.querySelector('.modify');
-	modifyButton.addEventListener('click', function() {
-		modifyAd(adId);
-	});
+// 保留原本的adtype
+let originalAdtype = "";
+// 開啟編輯模式
+function openEditAd() {
+    console.log("開啟編輯模式");
 
-	const leaveButton = document.querySelector('.leave');
-	leaveButton.addEventListener('click', function() {
-		closeModal();
-	});
+    const adtypeCell = document.querySelector(".ad-type");
+    const adtype = adtypeCell.textContent.trim();
+
+    originalAdtype = adtype;
+    adtypeCell.setAttribute("data-original-value", adtype);
+
+	// 之後從資料庫撈
+    const adtypeSelect = document.createElement("select");
+    const options = [
+        { value: "1", text: "30天", price: "NTD 300" },
+        { value: "2", text: "60天", price: "NTD 550" },
+    ];
+
+    options.forEach(option => {
+        const optionElement = document.createElement("option");
+        optionElement.value = option.value;
+        optionElement.textContent = option.text;
+
+        if (adtype === option.text) {
+            optionElement.selected = true;
+        }
+
+        adtypeSelect.appendChild(optionElement);
+    });
+
+    const priceDisplay = document.createElement("p");
+    priceDisplay.classList.add("price-display");
+    priceDisplay.textContent = `價格: ${options.find(option => option.text === adtype).price}`; // 預設顯示當前選擇的價格
+
+    adtypeCell.innerHTML = "";
+    adtypeCell.appendChild(adtypeSelect);
+    adtypeCell.appendChild(priceDisplay);
+
+    adtypeSelect.addEventListener('change', function () {
+        const selectedOption = options.find(option => option.value === adtypeSelect.value);
+        priceDisplay.textContent = `價格: ${selectedOption.price}`;
+    });
+
+    document.querySelector(".modify").style.display = "none";
+    document.querySelector(".submit").style.display = "inline-block";
+    document.querySelector(".cancel").style.display = "inline-block";
+
+    document.querySelector(".cancel").addEventListener('click', function() {
+        cancelEdit();
+    });
+
+    document.querySelector(".submit").addEventListener('click', function() {
+        submitEdit(adtypeCell);
+		filterAds();
+    });
 }
 
-function modifyAd(adId) {
-	// 假設我們會在這裡顯示一個表單，讓用戶修改廣告的資料
-	console.log("開始修改廣告 ID: ", adId);
-	// 例如，可以開啟一個表單或彈窗，允許用戶輸入新的廣告資訊
+
+// 取消編輯，將 adtype 欄位恢復原來的文字
+function cancelEdit() {
+    const adtypeCell = document.querySelector(".ad-type");
+    const originalValue = adtypeCell.getAttribute("data-original-value");
+
+    // 恢復為原來的文字顯示
+    adtypeCell.textContent = originalValue;
+
+    document.querySelector(".modify").style.display = "inline-block";
+    document.querySelector(".cancel").style.display = "none";
+    document.querySelector(".submit").style.display = "none";
 }
+
+// 提交修改
+function submitEdit() {
+    const adtypeCell = document.querySelector(".ad-type");  // 確保重新獲取 adtypeCell
+    if (!adtypeCell) {
+        console.error("adtypeCell 未找到");
+        return; // 若找不到 adtypeCell，則不執行
+    }
+
+    // 確保 select 元素存在
+    const selectElement = adtypeCell.querySelector("select");
+    if (!selectElement) {
+        console.error("找不到 select 元素");
+        return; // 若找不到 select，則不執行
+    }
+
+    const newAdtypeId = selectElement.value.trim();  // 取得選中的值
+
+    // 更新顯示為對應的廣告類型文字
+    adtypeCell.textContent = newAdtypeId === "1" ? "30天" : "60天";
+
+    // 隱藏按鈕
+    document.querySelector(".modify").style.display = "inline-block";
+    document.querySelector(".cancel").style.display = "none";
+    document.querySelector(".submit").style.display = "none";
+
+    // 取得廣告 ID 並準備提交數據
+    const adId = document.querySelector(".ad-id").textContent;
+    const editData = {
+        adId: adId,
+        newAdtypeId: newAdtypeId
+    };
+
+    console.log("選擇要提交的廣告類型: ", editData);
+
+    // 發送 AJAX 請求提交修改
+    $.ajax({
+        url: `${baseUrl}/EditAdServlet.do`,
+        type: "post",
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify(editData),
+        success: function(editedDetails) {
+            if (editedDetails) {
+                console.log("廣告更新結果: ", editedDetails);
+                alert("廣告資料已成功更新");
+                setupAdDetailsModal();
+            } else {
+                alert("修改失敗，請稍後再試");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("修改請求失敗: ", status, error);
+            alert("修改請求失敗，請稍後再試");
+        }
+    });
+}
+
 
 
 // 禁用按鈕
@@ -239,11 +367,6 @@ function enableButton(buttonSelector) {
 	});
 }
 
-let currentAdTypeId;  
-// 編輯廣告
-
-
-
 
 // 刪除廣告
 function cancelAd(adId) {
@@ -261,15 +384,15 @@ function cancelAd(adId) {
 			dataType: "json",
 			contentType: "application/json",
 			data: JSON.stringify(param),
-			success: function(result) {
-				console.log("刪除廣告結果: ", result);
+			success: function(success) {
+				console.log("刪除廣告結果: ", success);
 
-				if (result === "已刪除") {
+				if (success) {
 					alert("廣告已成功刪除");
 					closeModal();
 					filterAds();
 				} else {
-					alert("刪除廣告失敗: " + result);
+					alert("刪除廣告失敗: " + success);
 				}
 			},
 			error: function(error) {
@@ -324,25 +447,19 @@ document.getElementById("search").addEventListener("click", function() {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-	// 監聽選擇條件的變化
 	const searchConditionSelect = document.getElementById('search-condition');
 	const searchInputBox = document.getElementById('search-input-box');
 
-	// 初始狀態
 	toggleSearchInput(searchConditionSelect.value);
 
-	// 當選擇條件變化時，觸發顯示或隱藏搜尋框
 	searchConditionSelect.addEventListener('change', function() {
 		toggleSearchInput(this.value);
 	});
 
-	// 根據選擇的條件顯示或隱藏搜尋框
 	function toggleSearchInput(selectedValue) {
 		if (selectedValue === "all") {
-			// 若選擇的是 "所有訂單"，隱藏搜尋框
 			searchInputBox.style.display = "none";
 		} else {
-			// 其他情況顯示搜尋框
 			searchInputBox.style.display = "inline-block";
 
 			if (selectedValue === "adId") {
@@ -368,59 +485,58 @@ adStatusSelection.addEventListener("change", function() {
 });
 
 function updateFilterParams() {
-	filteredParams.searchCondition = document.getElementById("search-condition").value;
-	filteredParams.paidCondition = document.getElementById("paid-condition").value;
-	filteredParams.input = document.getElementById("search-input-box").value.trim();
-};
+    filteredParams.searchCondition = document.getElementById("search-condition").value;
+    filteredParams.paidCondition = document.getElementById("paid-condition").value;
+    filteredParams.input = document.getElementById("search-input-box").value.trim();
+}
 
+// 篩選廣告
+function filterAds() {
+    console.log("執行篩選參數: ", filteredParams);
 
-async function filterAds() {
-	console.log("執行篩選參數: ", filteredParams);
+    $.ajax({
+        url: `${baseUrl}/AdFilterServlet.do`,
+        type: "post",
+        dataType: "json",
+        contentType: "application/json",
+        xhrFields: { withCredentials: true },
+        data: JSON.stringify(filteredParams),
+        success: function(data) {
+            console.log("篩選出來的廣告: ", data);
 
-	$.ajax({
-		url: `${baseUrl}/AdFilterServlet.do`,
-		type: "post",
-		dataType: "json",
-		contentType: "application/json",
-		xhrFields: { withCredentials: true },
-		data: JSON.stringify(filteredParams),
-		success: function(data) {
+            // 更新表格
+            const table = $("#adtable").DataTable();
+            table.clear();
 
-			console.log("篩選出來的廣告: ", data);
+            if (!data || data.length === 0) {
+                console.warn("沒有符合篩選條件的廣告資料");
+                table.draw();
+                return;
+            }
 
-			// 更新表格
-			const table = $("#adtable").DataTable();
-			table.clear();
+            table.clear();
+            $.each(data, function(index, ad) {
+                table.row.add({
+                    adId: ad.adId || "未提供",
+                    userId: ad.userId || "未提供",
+                    userName: ad.userName || "未提供",
+                    houseId: ad.houseId || "未提供",
+                    adtypeName: ad.adtypeName.replace("?", "天") || "未提供",
+                    isPaid: ad.isPaid || "未提供",
+                    actions: `<button class="details-btn btn btn-warning btn-sm" data-id="${ad.adId}">查看詳細</button>
+                              <button class="delete-btn btn btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModelBox" data-id="${ad.adId}">刪除廣告</button>`
+                });
+            });
 
-			if (!data || data.length === 0) {
-				console.warn("沒有符合篩選條件的廣告資料");
-				table.draw();
-				return;
-			}
-
-			table.clear();
-			$.each(data, function(index, ad) {
-				table.row.add({
-					adId: ad.adId || "未提供",
-					userId: ad.userId || "未提供",
-					userName: ad.userName || "未提供",
-					houseId: ad.houseId || "未提供",
-					adtypeName: ad.adtypeName.replace("?", "天") || "未提供",
-					isPaid: ad.isPaid || "未提供",
-					actions: `<button class="details-btn btn btn-warning btn-sm" data-id="${ad.adId}">查看詳細</button>
-			                              <button class="delete-btn btn btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModelBox" data-id="${ad.adId}">刪除廣告</button>`
-				});
-			});
-
-			table.draw();
-			disableCancelButtonsOnDraw();
-			initDynamicButtonEvents();
-		},
-		error: function(xhr, status, error) {
-			console.error("AJAX Error: ", status, error);
-			console.error("Response Text: ", xhr.responseText);
-		},
-	});
-};
+            table.draw();
+            disableCancelButtonsOnDraw();
+            initDynamicButtonEvents();
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX Error: ", status, error);
+            console.error("Response Text: ", xhr.responseText);
+        }
+    });
+}
 
 

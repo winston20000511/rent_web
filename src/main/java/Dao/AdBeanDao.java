@@ -2,6 +2,7 @@ package Dao;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import Bean.AdBean;
 
@@ -13,10 +14,7 @@ public interface AdBeanDao {
 	List<AdBean> filterAds(String searchCondition, String paidCondition, String input);
 	AdBean checkAdDetails(Long adId);
 	
-	List<AdBean> getCanceledAdBeans();
-	
-	boolean updateAdBean(AdBean adBean);
-	AdBean updateAdBeanOnAdTypeAndPrice(Long adId, Integer adtypeId);
+	AdBean editAd(Long adId, Integer newAdtypeId);
 	
 	boolean deleteAdBeanByAdId(Long adId);
 	

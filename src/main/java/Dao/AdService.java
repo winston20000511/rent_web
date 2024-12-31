@@ -55,20 +55,23 @@ public class AdService {
 	}
 
 	/**
-	 * 接收輸入條件 receivedData ["adUpdate", "adId", "adType", "quantity"]，找到廣告並更新資料
+	 * 接收輸入條件
 	 * @param receivedData
 	 * @return
 	 */
-//	public AdDetailResponseDTO updateAdDetails(List<String> receivedData) {
-//		
-//		logger.info(receivedData.toString());
-//		
-//		String adType = (receivedData.get(2).equals("a")) ? "A廣告" : "B廣告"; // 可能要跟前端溝通名稱
-//		adBeanDao.updateAdBeanOnAdTypeAndPrice(
-//				Integer.parseInt(receivedData.get(1)), Integer.parseInt(receivedData.get(3))); // 要傳 adId 跟 adtypeId
-//		AdBean adBean = adBeanDao.getAdBeanByAdId(Integer.parseInt(receivedData.get(1)));
-//		return setAdView(adBean);
-//	}
+	public AdDetailResponseDTO editAd(Map<String, Object> params) {
+		logger.info("editAd中收到的參數: " + params.toString());
+		String adIdStr = (String)params.get("adId");
+		Long adId = Long.parseLong(adIdStr);
+		
+		String newAdtypeIdStr = (String)params.get("newAdtypeId");
+		logger.info("newAdtypeIdStr" + newAdtypeIdStr);
+		
+		Integer newAdtypeId = Integer.parseInt(newAdtypeIdStr);
+		
+		AdBean editedAd = adBeanDao.editAd(adId, newAdtypeId);
+		return setupAdDetailResponseDTO(editedAd);
+	}
 
 	/**
 	 * 刪除廣告 receivedData
