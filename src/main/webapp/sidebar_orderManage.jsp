@@ -2,13 +2,12 @@
 	pageEncoding="UTF-8" isELIgnored="false"%>
 <!DOCTYPE html>
 <html lang="zh-hant-TW">
-
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>訂單管理系統</title>
 <%-- log --%>
-<link rel="Rent icon" href="./imags/lpoqq-yg0x4-001.ico">
+<link rel="Rent icon" href="./imags/lpoqq-yg0x4-001.ico" />
 <%-- datatables --%>
 <link rel="stylesheet"
 	href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.css" />
@@ -22,11 +21,11 @@
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
 <%-- CSS --%>
-<link rel="stylesheet" type="text/css" href="CSS/backstage.css">
-<link rel="stylesheet" type="text/css" href="CSS/orderManage.css">
-
+<link rel="stylesheet" type="text/css" href="CSS/backstage.css" />
+<link rel="stylesheet" type="text/css" href="CSS/orderManage.css" />
 </head>
-<%-- header --%>
+<body>
+	<%-- header --%>
 	<nav class="nav navbar navbar-expand-lg navbar-dark">
 		<div class="container-fluid">
 			<h1 class="navbar-brand">
@@ -34,7 +33,7 @@
 			</h1>
 			<div class="d-flex justify-content-end align-items-center">
 				<div
-					class="d-flex justify-content-end align-items-center  navbar-text text-white me-3 ">
+					class="d-flex justify-content-end align-items-center navbar-text text-white me-3">
 					<span>歡迎,</span> <span class="admin-name" onclick="showSettings()">
 						<span id="adminName"></span> <span class="bi bi-pin-angle-fill"></span>
 					</span>
@@ -45,8 +44,8 @@
 	</nav>
 
 	<%-- Containers --%>
-<div class="containers">
-	<%-- Sidebar --%>
+	<div class="containers">
+		<%-- Sidebar --%>
 		<div class="sidebar">
 			<ul>
 				<li><a class="bi bi-card-checklist" href="backstage-panel.jsp"
@@ -70,137 +69,134 @@
 				<li><a class="bi bi-wallet" href="sidebar_complaints.jsp"
 					data-content="sidebar_settings">客訴管理系統<span
 						class="bi bi-caret-right-fill caret-icon"></span></a></li>
-
 			</ul>
 		</div>
 
-	<%-- Content --%>
-	<div class="content">
+		<%-- Content --%>
 		<div class="content">
-			<div class="Content">
+			<div class="content">
 				<div class="Content">
-					<h1>訂單管理</h1>
-					<div class="search-box">
-						<label class="select-box-label"> <select
-							name="searchCondition" id="search-condition">
-								<option value="all">所有廣告</option>
-								<option value="merchantTradNo">訂單編號</option>
-								<option value="userId">屋主編號</option>
-						</select>
-						</label> <label class="select-box-label"> <select
-							name="orderStatus" id="order-status">
-								<option value="" disabled selected>訂單狀態</option>
-								<option value="all">顯示全部</option>
-								<option value="active">一般訂單</option>
-								<option value="canceled">已取消訂單</option>
-						</select>
-						</label> <label class="select-box-label"> <input type="text"
-							name="searchInput" id="search-inupt-box"
-							placeholder="請輸入編號（搜尋所有廣告時請空白）" />
-						</label>
-						<button id="search" class="btn" type="button">搜尋</button>
-					</div>
-
-					<div>
+					<div class="Content">
+						<h1>訂單管理</h1>
 						<div>
-							<div class="title-box">搜尋結果</div>
-							<table id="ordertable" class="display">
-								<thead>
-									<tr>
-										<th>訂單編號</th>
-										<th>用戶編號</th>
-										<th>訂單狀態</th>
-										<th>下單時間</th>
-										<th>操作功能</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td class="order-id"></td>
-										<td class="user-id"></td>
-										<td></td>
-										<td class="order-time"></td>
-									</tr>
-								</tbody>
-							</table>
+							<label class="select-box-label"> <select
+								name="searchCondition" id="search-condition">
+									<option value="all" selected>所有訂單</option>
+									<option value="merchantTradNo">訂單編號</option>
+									<option value="userId">屋主編號</option>
+							</select>
+							</label> <label class="select-box-label"> <input type="text"
+								name="searchInput" id="search-input-box" style="display: none" />
+							</label> <label class="select-box-label"> <select
+								name="orderStatus" id="order-status">
+									<option value="" disabled selected>訂單狀況</option>
+									<option value="all" selected>顯示全部</option>
+									<option value="1">一般訂單</option>
+									<option value="0">已取消訂單</option>
+							</select>
+							</label>
+
+							<button id="search" class="btn" type="button">搜尋</button>
 						</div>
-					</div>
 
-					<div class="order-details-box">
-						<h5>訂單詳細資料</h5>
-						<table id="order-details">
-							<tbody>
-								<tr>
-									<th>訂單編號</th>
-									<td class="merchantTradNo">1</td>
-								</tr>
-								<tr>
-									<th>交易日期</th>
-									<td class="merchantTradDate">2024-10-16</td>
-								</tr>
-								<tr>
-									<th>用戶編號</th>
-									<td class="user-id">1</td>
-								</tr>
-								<tr>
-									<th>用戶姓名</th>
-									<td class="user-name">AAA</td>
-								</tr>
-								<tr>
-									<th>交易方式</th>
-									<td class="choose-payment">信用卡</td>
-								</tr>
-								<tr>
-									<th>訂單狀態</th>
-									<td class="order-status">信用卡</td>
-								</tr>
-								<tr>
-									<th colspan="2">訂單內容</th>
-								</tr>
-							</tbody>
-						</table>
-
-						<table id="ad-details">
-							<thead>
-								<tr>
-									<th>房屋編號</th>
-									<th>廣告編號</th>
-									<th>廣告類別</th>
-									<th>廣告天期</th>
-									<th>廣告單價</th>
-									<th>廣告數量</th>
-									<th>小計</th>
-								</tr>
-							</thead>
-							<tbody class="ad-details-tbody">
-								<tr>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-									<td></td>
-								</tr>
-								<tr class="total-amount">
-									<th colspan="7">總計</th>
-									<td>10000</td>
-								</tr>
-							</tbody>
-						</table>
-
-						<div class="button-box">
-							<button type="button" class="cancel-order btn">取消訂單</button>
-							<button type="button" class="leave btn">結束</button>
+						<div>
+							<div>
+								<div class="title-box">搜尋結果</div>
+								<table id="ordertable" class="display">
+									<thead>
+										<tr>
+											<th>訂單編號</th>
+											<th>用戶編號</th>
+											<th>用戶姓名</th>
+											<th>訂單狀態</th>
+											<th>下單時間</th>
+											<th>操作功能</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 						</div>
+
+						<div id="order-details-modal" class="modal">
+							<div class="modal-content">
+								<h5 style="text-align: center;">訂單詳細資料</h5>
+								<table id="order-details">
+									<tbody>
+										<tr>
+											<th>訂單編號</th>
+											<td class="merchantTradNo"></td>
+										</tr>
+										<tr>
+											<th>會員編號</th>
+											<td class="user-id">1</td>
+										</tr>
+										<tr>
+											<th>會員姓名</th>
+											<td class="user-name"></td>
+										</tr>
+										<tr>
+											<th>交易方式</th>
+											<td class="payment-method"></td>
+										</tr>
+										<tr>
+											<th>訂單狀態</th>
+											<td class="order-status"></td>
+										</tr>
+										<tr>
+											<th>付款時間</th>
+											<td class="paid-date"></td>
+										</tr>
+										<tr>
+											<th colspan="2">訂單內容</th>
+										</tr>
+									</tbody>
+								</table>
+
+								<table id="ad-details">
+									<thead>
+										<tr>
+											<th>房屋編號</th>
+											<th>房屋標題</th>
+											<th>廣告編號</th>
+											<th>廣告方案</th>
+											<th>方案價格</th>
+											<th>優惠折扣</th>
+											<th>廣告起訖</th>
+											<th>小計</th>
+										</tr>
+									</thead>
+									<tbody id="ad-details-tbody">
+										<tr class="total-amount">
+											<th colspan="7">總計</th>
+											<td class="total"></td>
+										</tr>
+									</tbody>
+								</table>
+
+								<div class="button-box">
+									<button type="button" class="cancel-order btn">取消訂單</button>
+									<button type="button" class="leave btn">結束</button>
+								</div>
+							</div>
+						</div>
+
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
 
-<%-- 管理者編輯<彈窗> --%>
+	<%-- 管理者編輯<彈窗> --%>
 	<div id="settingsModal" class="modal">
 		<div class="modal-content">
 			<span class="close" onclick="closeSettings()">&times;</span>
@@ -218,7 +214,7 @@
 	<div id="settingsModalBackdrop" class="modal-backdrop"></div>
 
 	<%-- 資料更新 --%>
-	<div id="updateTable" class="popup" style="display: none;">
+	<div id="updateTable" class="popup" style="display: none">
 		<table class="table">
 			<thead>
 				<tr>
@@ -240,45 +236,47 @@
 		<p>租屋網站後台管理 &copy; 2024</p>
 	</footer>
 
-
 	<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 	<script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
 	<script src="JS/backstage.js"></script>
 	<script src="JS/sidebar_orderManage.js"></script>
 	<script>
-$(function() {	
-    	
-    	var adminName = "${sessionScope.admin != null ? sessionScope.admin.adminName : '管理員'}";
-		document.getElementById("adminName").innerText = adminName;
-    	
+      $(function () {
+        var adminName =
+          "${sessionScope.admin != null ? sessionScope.admin.adminName : '管理員'}";
+        document.getElementById("adminName").innerText = adminName;
+
         // 無法獲取session時登出
         var adminOnOff = "${sessionScope.admin}";
         if (adminOnOff == "" || adminOnOff == null) {
-            outPanel();
+          outPanel();
         }
-        
+
         // 資料更新確認
         var updateConfirm = "${requestScope.updateConfirm}";
         if (updateConfirm !== "" && updateConfirm !== null) {
-            if (updateConfirm === "true") {
-                document.getElementById("statusCell").innerText = "成功";
-                document.getElementById("messageCell").innerText = "更新成功";
-                document.getElementById("updateTable").classList.add('popup-success');	
-                document.getElementById("settingsModalBackdrop").classList.add('show');	//添加遮罩
-                
-            } else {
-                document.getElementById("statusCell").innerText = "失敗";
-                document.getElementById("messageCell").innerText = "更新失敗";
-                document.getElementById("updateTable").classList.add('popup-error');	
-                document.getElementById("settingsModal").classList.add('show');
-                document.getElementById("settingsModalBackdrop").classList.add('show');	//添加遮罩
-            }
-            document.getElementById("updateTable").style.display = "block"; // 顯示表格
+          if (updateConfirm === "true") {
+            document.getElementById("statusCell").innerText = "成功";
+            document.getElementById("messageCell").innerText = "更新成功";
+            document
+              .getElementById("updateTable")
+              .classList.add("popup-success");
+            document
+              .getElementById("settingsModalBackdrop")
+              .classList.add("show"); //添加遮罩
+          } else {
+            document.getElementById("statusCell").innerText = "失敗";
+            document.getElementById("messageCell").innerText = "更新失敗";
+            document.getElementById("updateTable").classList.add("popup-error");
+            document.getElementById("settingsModal").classList.add("show");
+            document
+              .getElementById("settingsModalBackdrop")
+              .classList.add("show"); //添加遮罩
+          }
+          document.getElementById("updateTable").style.display = "block"; // 顯示表格
         }
-        
-     
-        
-     // 讀取管理者(admin)資料 (****需改成SERVLET請求)
+
+        // 讀取管理者(admin)資料 (****需改成SERVLET請求)
         document.getElementById("adminData").innerHTML = `
             <div class="mb-3">
                 <label for="adminNameInput" class="form-label">姓名</label>
@@ -297,7 +295,7 @@ $(function() {
                 <input type="text" id="adminPhoneInput" name="adminPhone" class="form-control" value="${sessionScope.admin.adminPhone}" autocomplete="off" required/>
             </div>
         `;
-    });	
-</script>
+      });
+    </script>
 </body>
 </html>

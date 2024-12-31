@@ -1,27 +1,30 @@
 
 .select-box-label {
-	border-right: 3px solid #343a40;
+	/* border: 3px solid #343a40; */
+	border-radius: 2px;
 	margin: 0 5px 0 0;
 }
 
-.search-box {
+/* .search-box {
 	border: 1px solid #343a40;
 	border-radius: 5px;
 	width: 600px;
-}
+} */
 
 #search-condition, #order-status {
-	border: none;
-	border-radius: 10px;
-	padding: 2px;
-	outline: none;
+	/* border: 3px solid #343a40; */
+	border-radius: 2px;
+	padding: 4px;
+	/* outline: none; */
 }
 
 #search-inupt-box {
-	border: 0px;
-	outline: none;
+	border-bottom: 2px solid #343a40;
+	border-radius: 2px;
 	text-align: center;
 	width: 300px;
+	outline: none;
+	display: none;
 }
 
 button {
@@ -34,6 +37,18 @@ button {
 .btn:hover {
 	background-color: #495057;
 	color: rgb(241, 241, 241);
+}
+
+.delete-btn {
+	color: rgb(73, 69, 54);
+	background-color: rgb(240, 128, 128);
+	border-radius: 3px;
+	border: 1px solid rgb(205, 92, 92);
+}
+
+.delete-btn:hover {
+	background-color: rgb(205, 92, 92);
+	border: 1px solid rgb(205, 92, 92);
 }
 
 #search {
@@ -76,14 +91,14 @@ button {
 }
 
 /* order details - css*/
-.order-details-box{
+#order-details-modal{
 	margin-top: 8px;
 	border-top: 2px solid #343a40;
 	padding: 5px 0;
    	display: none;
 }
 
-.order-details-box>h5 {
+#order-details-modal>h5 {
 	text-align: center;
 }
 
@@ -149,3 +164,70 @@ button {
   text-align: center;
   vertical-align: middle;
 }
+
+/* modal */
+body {
+  font-family: Arial, sans-serif;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 1000px;
+  position: relative;
+}
+
+.modal-content h5 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.5em;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+thead th {
+  background-color: #f4f4f4;
+}
+
+
+.button-box .btn {
+  margin-left: 10px;
+  padding: 10px 15px;
+  border: none;
+  background:  #343a40 ;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button-box .btn:hover {
+  background: rgb(57, 73, 79);
+}
+
+

@@ -60,8 +60,8 @@ public class UpdateUserServlet extends HttpServlet {
                 user.setEmail(email);
                 user.setPassword(password);
                 user.setPhone(phone);
-                user.setGender(gender);
-                user.setStatus(status);
+//                user.setGender(gender);
+//                user.setStatus(status);
                 session.update(user); // 更新用戶資料
 
                 transaction.commit();

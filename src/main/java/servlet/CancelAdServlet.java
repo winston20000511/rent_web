@@ -3,20 +3,18 @@ package servlet;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Type;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import org.hibernate.Session;
 
+import com.example.demo.dto.AdDetailsResponseDTO;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import DTO.OrderDetailsDTO;
-import Dao.OrderService;
+import Dao.AdService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -25,15 +23,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import util.HibernateUtil;
 import util.ZonedDateAdapter;
 
-@WebServlet("/OrderDataOperationServlet.do")
-public class OrderDataOperationServlet extends HttpServlet {
+/**
+ * Servlet implementation class OrderCheckDetailsServlet
+ */
+@WebServlet("/CancelAdServlet.do")
+public class CancelAdServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Logger logger = Logger.getLogger(OrderDataOperationServlet.class.getName());
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		processAction(request, response);
-	}
+	private Logger logger = Logger.getLogger(CancelAdServlet.class.getName());
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -61,36 +57,23 @@ public class OrderDataOperationServlet extends HttpServlet {
 				requestJson.append(line);
 			}
 
-			// debugging
-			logger.info("requestJson order update/cancel:" + requestJson.toString());
-
+			logger.info("requestJson ad to be canceled " + requestJson.toString());
+			
 			Gson gson = new GsonBuilder().registerTypeAdapter(ZonedDateTime.class, new ZonedDateAdapter()).create();
-			Type listType = new TypeToken<List<String>>() {
-			}.getType();
-			List<String> receivedData = gson.fromJson(requestJson.toString(), listType);
-
-			OrderService orderService = new OrderService(session);
+			Map<String, Object> params = gson.fromJson(requestJson.toString(), new TypeToken<Map<String, Object>>() {}.getType());
+			logger.info("received data: " + params);
+			
+			AdService adService = new AdService(session);
 			String jsonResponse = null;
 
-			switch (receivedData.get(0)) {
-			case "search":
-				logger.info("進入 search");
-				List<OrderDetailsDTO> filteredOrders = orderService.getFilteredOrders(receivedData);
-				jsonResponse = gson.toJson(filteredOrders);
-				break;
-
-			case "orderDetails":
-				OrderDetailsDTO orderDetails = orderService.getOrderDetailsByTradNo(receivedData);
-				jsonResponse = gson.toJson(orderDetails);
-				break;
-
-			case "cancelOrder":
-				Map<String, Object> canceledOrder = orderService.cancelOrder(receivedData);
-				jsonResponse = gson.toJson(canceledOrder);
-				break;
-
-			}
-
+			// 調用adService的方法
+			Double adIdDouble = (Double) params.get("adId");
+			Long adIdLong = adIdDouble.longValue();
+			boolean result = adService.deleteAd(adIdLong);
+			logger.info("delte 是否成功刪除: " + result);
+			
+			jsonResponse = gson.toJson(result);
+			
 			out.write(jsonResponse);
 			session.getTransaction().commit();
 

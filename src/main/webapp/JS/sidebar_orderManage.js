@@ -1,344 +1,433 @@
-"use strict";
+const baseUrl = "http://localhost:8080/rent_web";
 
-// 取出固定不變的元素
-let searchBtn;
-let tableInitial;
+// 初始化篩選條件
+let filteredParams = {
+	searchCondition: "all",
+	orderStatus: "all",
+	input: "",
+};
 
 $(document).ready(function() {
-
-	// 回傳的ads資料
-	let orders = [];
-
-	// 選取所有的 buttons
-	const btns = document.querySelectorAll(".btn");
-	btns.forEach((btn) => {
-		btn.addEventListener("click", {
-			once: true,
-		});
-	});
-
-	searchBtn = document.getElementById("search");
-
-	loadTable();
-
-	// async: 頁面載入時，確保在獲取所有資料之前不會繼續執行其他程式碼
-	async function loadTable() {
-
-		// 銷毀舊的 DataTable 實例（如果存在）
-		if ($.fn.DataTable.isDataTable('#orderTable')) {
-			$('#ordertable').DataTable().destroy();
-		}
-
-		// 初始化 DataTable，將所有設置合併
-		tableInitial = $("#ordertable").DataTable({
-			language: {
-				url: "https://cdn.datatables.net/plug-ins/2.1.8/i18n/zh-HANT.json" // 使用繁體中文
-			},
-			autoWidth: true,
-			info: true,
-			processing: true, // 顯示資料加載中提示
-			stateSave: true, // 保存使用者狀態
-			lengthMenu: [10], // 每頁顯示 10 條數據
-			dom: '<f<t><ip>>', // 自訂 DOM 結構
-			searching: false,
-			lengthChange: false,
-			data: orders, // 設置數據
-			columns: [
-				// 設置欄位名稱及對應的數據
-				{ title: "訂單編號", data: "merchantTradNo" },
-				{ title: "用戶編號", data: "userId" },
-				{ title: "訂單狀態", data: "orderStatus" },
-				{ title: "下單時間", data: "merchantTradDate" },
-				{
-					title: "操作功能",
-					data: null,
-					render: function(data, type, row) {
-						return `<button type="button" class="btn btn-warning btn-sm details-btn">詳細資料</button>`;
-					},
-				},
-			],
-		});
-
-		// 0. 顯示所有訂單
-		orders = await displayData({ orders, tableInitial, searchParams: {} });
-		// debugging
-		console.log("顯示所有訂單的: ", orders);
-
-		// 1. 搜尋：傳送選取條件
-		searchBtn.addEventListener("click", function() {
-			searchData(orders, tableInitial);
-		});
-
-		// 2. 確認訂單詳細資料
-		// 3. 確認訂單詳細 > 修改 + 送出
-		// 4. 確認訂單詳細 > 結束
-		checkDetails(orders, tableInitial);
-
-	} // loadTable
-
+	initOrderTable();
 });
 
-// functions
+function initOrderTable() {
+    if ($.fn.DataTable.isDataTable('#ordertable')) {
+        $('#ordertable').DataTable().clear().destroy();
+    }
+    $.ajax({
+        url: `${baseUrl}/OrderFilterServlet.do`,
+        type: "post",
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify(filteredParams),
+        success: function(data) {
+            console.log("篩選出來的訂單: ", data);
+            if (!data || data.length === 0) {
+                console.warn("沒有符合篩選條件的訂單資料");
+                return;
+            }
 
-// 0. 顯示所有訂單
-async function displayData({ orders, tableInitial, searchParams }) {
-	if (!searchParams.input) searchParams.input = "";
-	let dataToSend = [
-		"search",
-		searchParams.condition || "all",
-		searchParams.orderStatus || "all",
-		searchParams.input.trim() || "",
-	];
+            const table = $("#ordertable").DataTable({
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/2.1.8/i18n/zh-HANT.json",
+					info: "", 
+                },
+                processing: true,
+                searching: false,
+                pageLength: 20,
+                dom: '<f><t><i><p>', //l:length不使用;控制一次展示幾筆
+                columns: [
+                    { data: "orderId" },
+                    { data: "userId" },
+                    { data: "userName" },
+                    { data: "orderStatus" },
+                    { data: "paidDate" },
+                    { data: "actions" }  // 確保 actions 列存在
+                ],
+                columnDefs: [
+                    { orderable: false, targets: [4, 5] } // 修正為 targets: [4, 5]
+                ]
+            });
 
-	// debugging
-	console.log("display all data to send: " + dataToSend);
+            // 更新表格數據
+            table.clear();
+            $.each(data, function(index, order) {
+                table.row.add({
+                    orderId: order.orderId || "未提供",
+                    userId: order.userId || "未提供",
+                    userName: order.userName || "未提供",
+                    orderStatus: order.orderStatus || "未提供",
+                    paidDate: order.paidDate || "未提供",
+                    actions: `<button class="details-btn btn btn-warning btn-sm" data-id="${order.orderId}">查看詳細</button>
+                              <button class="delete-btn btn btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModelBox" data-id="${order.orderId}">取消訂單</button>`
+                });
+            });
 
-	try {
-		let fetchedOrders = await fetchData(
-			"http://localhost:8080/rent_web/OrderDataOperationServlet.do",
-			dataToSend
-		);
-
-		orders = Array.isArray(fetchedOrders) ? fetchedOrders : [fetchedOrders];
-
-		tableInitial.clear().rows.add(orders).draw();
-
-		return orders;
-	} catch (error) {
-		console.log("fetch error:", error);
-		return [];
-	}
+            table.draw();
+            disableCancelButtonsOnDraw();
+            initDynamicButtonEvents();
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX Error: ", status, error);
+            console.error("Response Text: ", xhr.responseText);
+        }
+    });
 }
 
-// 1. 搜尋資料
-async function searchData(orders, tableInitial) {
-	// 取得搜尋條件及值
-	let searchParams = {
-		condition: document.getElementById("search-condition").value,
-		orderStatus: document.getElementById("order-status").value,
-		input: document.getElementById("search-inupt-box").value,
-	};
 
-	// 呼叫 displayData() 以顯示結果
-	const resultAds = await displayData({ orders, tableInitial, searchParams });
-
-	// debugging
-	console.log("search data: " + resultAds);
+// 禁用按鈕樣式
+function disableCancelButton(orderId) {
+	$(".delete-btn[data-id='" + orderId + "']").prop("disabled", true)
+		.css({
+			"background-color": "#ccc",
+			"cursor": "not-allowed"
+		});
 }
 
-// 2.
-// 查看詳細：顯示訂單詳細表
-async function checkDetails(orders, tableInitial) {
-	$("#ordertable tbody").on("click", ".details-btn", async function() {
-		try {
-			// 顯示
-			let orderDetailsBox = document.querySelector(".order-details-box");
-			orderDetailsBox.style.display = "block";
+// 禁用取消按鈕
+function disableCancelButtonsOnDraw() {
+	$("#ordertable .delete-btn").each(function() {
+		const orderId = $(this).data("id");
+		const orderStatus = $(this).closest("tr").find("td:eq(3)").text();
 
-			// 取得該 row 的 order id
-			let rowMerchantTradNo = tableInitial.row($(this).closest("tr")).data().merchantTradNo;
-			// 取得該 row 的 order status
-			let rowOrderStatus = tableInitial.row($(this).closest("tr")).data().orderStatus;
-
-			// 顯示訂單詳細表內容
-			displayOrderDetails(orders, tableInitial, rowMerchantTradNo);
-			console.log(rowOrderStatus)
-			
-			// 取消訂單
-			// 已取消的不能取消
-			if (rowOrderStatus === "已取消") {
-				console.log("inner if: " + rowOrderStatus);
-				document.querySelector(".cancel-order.btn").innerHTML = "訂單已取消";
-				document.querySelector(".cancel-order.btn").disabled = true;
-			} else if(rowOrderStatus === "一般訂單") {
-				console.log("inner if: " + rowOrderStatus);
-				document.querySelector(".cancel-order.btn").innerHTML = "取消訂單";
-				document.querySelector(".cancel-order.btn").disabled = false;
-				$(".button-box").off("click", ".cancel-order.btn").on("click", ".cancel-order.btn", async function() {
-					if (confirm("是否確定要取消訂單？")) {
-						let canceledOrder = await cancelOrder(rowMerchantTradNo);
-						alert("訂單已取消");
-						// 同步更新 data table
-						tableInitial.clear().rows.add(canceledOrder).draw();
-						// 印出新 order details
-						displayOrderDetails(canceledOrder, tableInitial, rowMerchantTradNo);
-						// 鎖定取消按鈕
-						document.querySelector(".cancel-order.btn").innerHTML = "訂單已取消";
-						document.querySelector(".cancel-order.btn").disabled = true;
-					} else {
-						alert("訂單未取消");
-					}
-				});
-			}
-
-			// 點擊結束編輯 = 結束查看訂單詳細資料
-			$(".button-box").on("click", ".leave.btn", async function() {
-				endupChecking();
-			});
-
-			// 按下搜尋後，關閉訂單明細
-			searchBtn.addEventListener("click", function() {
-				endupChecking();
-			});
-		} catch (error) {
-			console.log("fetch error:", error);
+		if (orderStatus === "已取消") {
+			disableCancelButton(orderId);
 		}
 	});
 }
 
-// 取得資料庫 data
-async function fetchData(url, dataToSend) {
-	try {
-		let response = await fetch(url, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"Cache-Control": "no-cache", // 防止瀏覽器快取
-				Pragma: "no-cache", // 適用於舊版 HTTP
-			},
-			body: JSON.stringify(dataToSend),
-		});
+// 初始化動態按鈕
+function initDynamicButtonEvents() {
+    $("#ordertable").off("click", ".details-btn").on("click", ".details-btn", function() {
+        const orderId = $(this).data("id");
+        viewOrderDetails(orderId);
+    });
 
-		if (!response.ok) throw new Error("server response error");
+    $("#ordertable").off("click", ".delete-btn").on("click", ".delete-btn", function() {
+        const orderId = $(this).data("id");
+        const orderStatus = $(this).closest("tr").find(".order-status").text();
 
-		const data = await response.json();
-		return data || []; // 返回空陣列以防止 undefined
-	} catch (error) {
-		console.log("fetch error:", error);
-		return []; // 在錯誤情況下返回空陣列
-	}
+        if (orderStatus === "已取消") {
+            disableButton('.cancel-order');
+            return;
+        }
+
+        cancelOrder(orderId);
+    });
 }
 
-// 顯示訂單詳細內容
-async function displayOrderDetails(orders, tableInitial, merchantTradNo) {
-	// 取得訂單詳細資料表的所有 td，放進 map
-	let classNames = [
-		"merchantTradNo",
-		"merchantTradDate",
-		"user-id",
-		"user-name",
-		"choose-payment",
-		"order-status",
-	];
 
-	console.log("class names: " + classNames);
 
-	let tds = classNames.map((className) => {
-		return document.querySelectorAll(`#order-details .${className}`);
+const modal = document.getElementById("order-details-modal");
+const closeButton = document.querySelector(".leave");
+
+function openModal() {
+	const modal = document.getElementById("order-details-modal");
+	modal.style.display = "flex";
+}
+
+function closeModal() {
+	const modal = document.getElementById("order-details-modal");
+	modal.style.display = "none";
+}
+
+// 點擊結束按鈕關閉彈窗
+closeButton.addEventListener("click", closeModal);
+
+
+function setupModalButtons(orderId) {
+	const cancelOrderButton = document.querySelector('.cancel-order');
+	cancelOrderButton.addEventListener('click', function() {
+		cancelOrder(orderId);
 	});
 
-	// debugging
-	let dataToSend = ["orderDetails", merchantTradNo];
-
-	let fetchedData = await fetchData(
-		"http://localhost:8080/rent_web/OrderDataOperationServlet.do",
-		dataToSend
-	);
-
-	// 解析json物件
-	let { userId, merchantTradDate, choosePayment, orderStatus, totalAmount } = fetchedData;
-	let { ads } = fetchedData;
-
-	// 確保 data 是陣列 + 取得訂單表格
-	orders = { userId, merchantTradNo, merchantTradDate, choosePayment, orderStatus, totalAmount };
-
-	// debugging	
-	console.log("fetch order details: " + JSON.stringify(orders));
-	console.log("fetch ads details: " + JSON.stringify(ads));
-
-	// 更新 data table
-	tableInitial.clear().rows.add([orders]).draw();
-
-	if (Object.keys(orders).length > 0) {
-
-		// 將資料更新到對應的 td
-		let orderDetails = [
-			orders.merchantTradNo,
-			orders.merchantTradDate,
-			userId,
-			ads[0].userName,
-			orders.choosePayment,
-			orders.orderStatus
-		];
-
-		console.log("order details: " + orderDetails);
-
-		tds.forEach((tdList, index) => {
-			tdList.forEach((td) => (td.textContent = orderDetails[index]));
-		});
-
-		// 動態新增廣告詳細資料
-		addAdDetails(ads); // 整合到這裡，將取得的廣告資料加入
-	}
-
-	return orders;
-}
-
-// 動態加上廣告詳細資料
-function addAdDetails(adDetails) {
-	console.log("add ad details: ", adDetails);
-
-	const adDetailsTbody = document.querySelector(
-		"#ad-details .ad-details-tbody"
-	);
-
-	adDetailsTbody.innerHTML = "";
-
-	// 將每個廣告資料動態加入到表格
-	adDetails.forEach((ad) => {
-		const tr = document.createElement("tr");
-
-		tr.innerHTML = `
-      <td>${ad.houseId}</td>
-      <td>${ad.adId}</td>
-      <td>${ad.adType}</td>
-      <td>${ad.adDuration}天</td>
-      <td>${ad.adPrice}</td>
-      <td>${ad.quantity}</td>
-      <td>${ad.adPrice * ad.quantity}</td>
-    `;
-
-		adDetailsTbody.appendChild(tr);
-
-		// 將 tr 加入到 tbody 中
-		adDetailsTbody.appendChild(tr);
+	// 為結束按鈕添加事件監聽
+	const leaveButton = document.querySelector('.leave');
+	leaveButton.addEventListener('click', function() {
+		closeModal();
 	});
-
-	// 動態插入總計欄位
-	const totalRow = document.createElement("tr");
-	totalRow.classList.add("total-amount");
-	totalRow.innerHTML = `
-      <th colspan="5">總計</th>
-      <td>${adDetails.reduce(
-		(sum, ad) => sum + ad.adPrice * ad.quantity,
-		0
-	)}</td>
-    `;
-
-	adDetailsTbody.appendChild(totalRow);
 }
 
-function endupChecking() {
-	let OrderDetailsBox = document.querySelector(".order-details-box");
-	OrderDetailsBox.style.display = "none";
+// 查看訂單詳細
+const orderDetailsBox = document.getElementById("order-details-box");
+function viewOrderDetails(orderId) {
+	const param = {
+		"orderId": orderId,
+	};
+
+	console.log("查看訂單詳細 ID: ", orderId);
+
+	$.ajax({
+		url: `${baseUrl}/OrderCheckDetailsServlet.do`,
+		type: "post",
+		dataType: "json",
+		contentType: "application/json",
+		data: JSON.stringify(param),
+		success: function(orderDetails) {
+			console.log("訂單詳細資料: ", orderDetails);
+
+			// 填充訂單資料
+			setupOrderDetailsModal(orderDetails);
+			setupAdInfoForOrderDetailsModal(orderDetails);
+
+			// 設置取消按鈕
+			setupModalButtons(orderId);
+			if (orderDetails.orderStatus === "已取消") {
+				disableButton(".cancel-order[data-id='" + orderId + "']");
+			} else {
+				// 若訂單狀態不是已取消，啟用取消按鈕
+				enableButton(".cancel-order[data-id='" + orderId + "']");
+			}
+
+			// 打開彈窗
+			openModal();
+		},
+	});
+}
+
+// 禁用按鈕
+function disableButton(buttonSelector) {
+	const button = document.querySelector(buttonSelector);
+
+	button.disabled = true;
+
+	button.style.backgroundColor = "#ccc";
+	button.style.cursor = "not-allowed";
+}
+
+// 啟用按鈕
+function enableButton(buttonSelector) {
+	$(buttonSelector).prop("disabled", false).css({
+		"background-color": "#343a40",
+		"cursor": ""
+	});
 }
 
 // 取消訂單
-async function cancelOrder(rowMerchantTradNo) {
-	let dataToSend = ["cancelOrder", rowMerchantTradNo];
-	console.log("cancel order data to send: ", dataToSend);
+function cancelOrder(orderId) {
+	const param = {
+		"orderId": orderId,
+	};
 
-	let fetchedData = await fetchData(
-		"http://localhost:8080/rent_web/OrderDataOperationServlet.do",
-		dataToSend
-	);
+	console.log("取消訂單 ID: ", orderId);
 
-	console.log("fetch data canceled order: ", JSON.stringify(fetchedData));
+	const userConfirm = confirm("確定要取消訂單嗎？")
+	if (userConfirm) {
+		$.ajax({
+			url: `${baseUrl}/CancelOrderServlet.do`,
+			type: "post",
+			dataType: "json",
+			contentType: "application/json",
+			data: JSON.stringify(param),
+			success: function(response) {
+				console.log("取消訂單結果: ", response);
 
-	// 確保取得並回傳陣列
-	let canceledOrderData = Array.isArray(fetchedData)
-		? fetchedData
-		: [fetchedData];
-
-	return canceledOrderData;
+				if (response.orderStatus === "已取消") {
+					alert("訂單已成功取消");
+					disableButton(".delete-btn[data-id='" + orderId + "']");
+					disableButton(".cancel-order[data-id='" + orderId + "']");
+					setupOrderDetailsModal(response);
+					setupAdInfoForOrderDetailsModal(response);
+				} else {
+					alert("取消訂單失敗: " + response.message);
+				}
+			},
+			error: function(error) {
+				console.log("取消訂單請求失敗: ", error);
+				alert("取消訂單請求失敗，請稍後再試");
+			}
+		});
+	} else {
+		alert("訂單尚未取消");
+	}
 }
+
+// 設置 order detail modal
+function setupOrderDetailsModal(orderDetails) {
+	const orderIdElement = document.querySelector(".merchantTradNo");
+	orderIdElement.textContent = orderDetails.orderId;
+
+	const userIdElement = document.querySelector(".user-id");
+	userIdElement.textContent = orderDetails.userId;
+
+	const userNameElement = document.querySelector(".user-name");
+	userNameElement.textContent = orderDetails.userName;
+
+	const paymentMethodElement = document.querySelector(".payment-method");
+	paymentMethodElement.textContent = orderDetails.paymentMethod;
+
+	const orderStatusElement = document.querySelector(".order-status");
+	orderStatusElement.textContent = orderDetails.orderStatus;
+
+	const paidDateElement = document.querySelector(".paid-date");
+	paidDateElement.textContent = orderDetails.paidDate.substring(0, 10);
+
+	document.querySelector(".cancel-order").setAttribute("data-id", orderDetails.orderId);
+}
+
+function setupAdInfoForOrderDetailsModal(orderDetails) {
+	const tbody = document.getElementById("ad-details-tbody");
+	const totalAmountTr = tbody.querySelector(".total-amount");
+
+	if (!tbody || !totalAmountTr) {
+		console.error("未找到 tbody 或 .total-amount 的 <tr>");
+		return;
+	}
+
+	// 清除舊的詳細資料行
+	const rowsToRemove = Array.from(tbody.querySelectorAll("tr:not(.total-amount)"));
+	rowsToRemove.forEach(row => row.remove());
+
+	// 確保所有屬性數組長度一致
+	const rowCount = orderDetails.adIds.length;
+
+	for (let i = 0; i < rowCount; i++) {
+		const tr = document.createElement("tr");
+
+		// 插入指定屬性
+		const houseIdTd = document.createElement("td");
+		houseIdTd.textContent = orderDetails.houseIds[i] || "";
+		tr.appendChild(houseIdTd);
+
+		const houseTitleTd = document.createElement("td");
+		houseTitleTd.textContent = orderDetails.houseTitles[i] || "";
+		tr.appendChild(houseTitleTd);
+
+		const adIdTd = document.createElement("td");
+		adIdTd.textContent = orderDetails.adIds[i] || "";
+		tr.appendChild(adIdTd);
+
+		const adNameTd = document.createElement("td");
+		adNameTd.textContent = orderDetails.adNames[i].replace("?", "天") || "";
+		tr.appendChild(adNameTd);
+
+		const adOriginalPriceTd = document.createElement("td");
+		adOriginalPriceTd.textContent = orderDetails.adOriginalPrices[i] || "";
+		tr.appendChild(adOriginalPriceTd);
+
+		const adDiscountedTd = document.createElement("td");
+		const discount = (orderDetails.adOriginalPrices[i] - orderDetails.adDisCountedPrices[i]);
+		console.log("折扣優惠: " + discount);
+		adDiscountedTd.textContent = discount || "";
+		tr.appendChild(adDiscountedTd);
+
+		const adPeriodTd = document.createElement("td");
+		adPeriodTd.textContent = orderDetails.adPeriods[i] || "";
+		tr.appendChild(adPeriodTd);
+		
+		const adDiscountedPriceTd = document.createElement("td");
+		adDiscountedPriceTd.textContent = orderDetails.adDisCountedPrices[i] || "";
+		tr.appendChild(adDiscountedPriceTd);
+		
+		const totalAmountThElement = document.querySelector(".total");
+		totalAmountThElement.textContent = orderDetails.totalAmount;
+
+		tbody.insertBefore(tr, totalAmountTr);
+	}
+}
+
+
+
+// 開關篩選欄位
+const searchInput = document.getElementById("search-input-box");
+console.log("篩選input: " + searchInput)
+function toggleSearchInput() {
+	if (searchInput.style.display === "none" || searchInput.style.display === "") {
+		searchInput.style.display = "block";
+	} else {
+		searchInput.style.display = "none";
+	}
+}
+
+document.getElementById("search").addEventListener("click", function() {
+	// 更新篩選條件
+	updateFilterParams();
+	console.log("更新後的篩選條件: ", filteredParams);
+	filterOrders();
+});
+
+// 監聽使用者選擇的條件
+const searchConditionSelection = document.getElementById("search-condition");
+searchConditionSelection.addEventListener("change", function() {
+	console.log("searchConditionSelection.value: ", searchConditionSelection.value);
+
+	if (searchConditionSelection.value === "merchantTradNo") {
+		searchInput.style.display = "block";
+		searchInput.placeholder = "請輸入訂單編號";
+	}
+
+	if (searchConditionSelection.value === "userId") {
+		searchInput.style.display = "block";
+		searchInput.placeholder = "請輸入屋主編號";
+	}
+
+	if (searchConditionSelection.value === "all") {
+		searchInput.placeholder = "";
+		searchInput.style.display = "none";
+	}
+
+	updateFilterParams();
+});
+
+const orderStatusSelection = document.getElementById("order-status");
+orderStatusSelection.addEventListener("change", function() {
+	updateFilterParams();
+});
+
+function updateFilterParams() {
+	filteredParams.searchCondition = document.getElementById("search-condition").value;
+	filteredParams.orderStatus = document.getElementById("order-status").value;
+	filteredParams.input = document.getElementById("search-input-box").value.trim();
+};
+
+
+async function filterOrders() {
+	console.log("執行篩選參數: ", filteredParams);
+
+	$.ajax({
+		url: `${baseUrl}/OrderFilterServlet.do`,
+		type: "post",
+		dataType: "json",
+		contentType: "application/json",
+		xhrFields: { withCredentials: true },
+		data: JSON.stringify(filteredParams),
+		success: function(data) {
+
+			console.log("篩選出來的訂單: ", data);
+
+			// 更新表格
+			const table = $("#ordertable").DataTable();
+			table.clear();
+
+			if (!data || data.length === 0) {
+				console.warn("沒有符合篩選條件的訂單資料");
+				table.draw();
+				return;
+			}
+
+			$.each(data, function(index, order) {
+				table.row.add({
+					orderId: order.orderId || "未提供",
+					userId: order.userId || "未提供",
+					userName: order.userName || "未提供",
+					orderStatus: order.orderStatus || "未提供",
+					paidDate: order.paidDate || "未提供",
+					actions: `<button class="details-btn btn btn-warning btn-sm" data-id="${order.orderId}">查看詳細</button>
+<button class="delete-btn btn btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModelBox" data-id="${order.orderId}">取消訂單</button>`
+				});
+
+			});
+
+			table.draw();
+			disableCancelButtonsOnDraw();
+			initDynamicButtonEvents();
+		},
+		error: function(xhr, status, error) {
+			console.error("AJAX Error: ", status, error);
+			console.error("Response Text: ", xhr.responseText);
+		},
+	});
+};
+
+

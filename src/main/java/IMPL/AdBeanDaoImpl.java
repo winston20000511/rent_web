@@ -1,15 +1,19 @@
 package IMPL;
 
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import Bean.AdBean;
+import Bean.AdtypeBean;
 import Dao.AdBeanDao;
 
 public class AdBeanDaoImpl implements AdBeanDao {
 
+	private Logger logger = Logger.getLogger(OrderBeanDaoImpl.class.getName());
 	private Session session;
 
 	public AdBeanDaoImpl(Session session) {
@@ -34,94 +38,67 @@ public class AdBeanDaoImpl implements AdBeanDao {
 	}
 
 	@Override
-	public AdBean getAdBeanByAdId(Integer adId) {
-		return session.get(AdBean.class, adId);
+	public List<AdBean> filterAds(String searchCondition, String paidCondition, String input) {
+	    StringBuilder hqlstr = new StringBuilder("FROM AdBean a ");
+	    boolean hasCondition = false;
+
+	    if (searchCondition != null && input != null && !input.isEmpty()) {
+	        if (searchCondition.equals("adId")) {
+	            hqlstr.append(hasCondition ? " AND " : " WHERE ");
+	            hqlstr.append("CAST(a.adId AS string) LIKE :input ");
+	            hasCondition = true;
+	        } else if (searchCondition.equals("userId")) {
+	            hqlstr.append(hasCondition ? " AND " : " WHERE ");
+	            hqlstr.append("CAST(a.user.id AS string) LIKE :input ");
+	            hasCondition = true;
+	        } else if (searchCondition.equals("houseId")) {
+	            hqlstr.append(hasCondition ? " AND " : " WHERE ");
+	            hqlstr.append("CAST(a.house.id AS string) LIKE :input "); 
+	            hasCondition = true;
+	        }
+	    }
+
+	    // 根據付款狀況來篩選廣告
+	    if (paidCondition != null && !paidCondition.equals("all") && !paidCondition.isEmpty()) {
+	        hqlstr.append(hasCondition ? " AND " : " WHERE ");
+	        hqlstr.append("a.isPaid = :isPaid ");
+	    }
+
+	    logger.info("HQL 查詢字串: " + hqlstr.toString());
+
+	    // 執行查詢
+	    Query<AdBean> query = session.createQuery(hqlstr.toString(), AdBean.class);
+
+	    // 根據條件設置搜尋參數
+	    if (searchCondition != null && input != null && !input.isEmpty()) {
+	        query.setParameter("input", "%" + input + "%"); 
+	    }
+
+	    if (paidCondition != null && !paidCondition.isEmpty() && !paidCondition.equals("all")) {
+	        query.setParameter("isPaid", paidCondition);
+	    }
+
+	    // 返回結果
+	    List<AdBean> resultList = query.getResultList();
+	    return resultList;
+	}
+
+
+
+	@Override
+	public AdBean checkAdDetails(Long adId) {
+        String hql = "FROM AdBean a WHERE a.adId = :adId";
+        Query<AdBean> query = session.createQuery(hql, AdBean.class);
+        query.setParameter("adId", adId);
+
+        return query.getSingleResult();
 	}
 
 	@Override
-	public List<AdBean> getAdBeansByUserId(Integer userId) {
-		Query<AdBean> query = session.createQuery("from AdBean a where a.user.userId = :userId", AdBean.class);
-		query.setParameter("userId", userId);
-		return query.getResultList();
-	}
-
-	@Override
-	public List<AdBean> getAdBeansByHouseId(Integer houseId) {
-		Query<AdBean> query = session.createQuery("from AdBean where houseId = :houseId", AdBean.class);
-		query.setParameter("houseId", houseId);
-		return query.getResultList();
-	}
-
-	@Override
-	public List<AdBean> getAdBeansByIsPaid(Boolean ispaid) {
-		Query<AdBean> query = session.createQuery("from AdBean where ispaid = :ispaid", AdBean.class);
-		query.setParameter("ispaid", ispaid);
-		return query.getResultList();
-	}
-
-	@Override
-	public List<AdBean> getAdBeanByAdIdAndIsPaid(Integer adid, Boolean ispaid) {
-		Query<AdBean> query = session.createQuery("from AdBean where adid = :adid and ispaid = :ispaid", AdBean.class);
-		query.setParameter("adid", adid);
-		query.setParameter("ispaid", ispaid);
-		return query.getResultList();
-	}
-
-	@Override
-	public List<AdBean> getAdBeansByHouseIdAndIsPaid(Integer houseid, Boolean ispaid) {
-		Query<AdBean> query = session.createQuery("from AdBean where houseid = :houseid and ispaid = :ispaid", AdBean.class);
-		query.setParameter("houseid", houseid);
-		query.setParameter("ispaid", ispaid);
-		return query.getResultList();
-	}
-
-	@Override
-	public List<AdBean> getAdBeansByUserIdAndIsPaid(Integer userid, Boolean ispaid) {
-		Query<AdBean> query = session.createQuery("from AdBean where userid = :userid and ispaid = :ispaid", AdBean.class);
-		query.setParameter("userid", userid);
-		query.setParameter("ispaid", ispaid);
-		return query.getResultList();
-	}
-
-	@Override
-	public List<AdBean> getAdBeansByOrderId(String orderid) {
-		Query<AdBean> query = session.createQuery("from AdBean where orderid = :orderid", AdBean.class);
-		query.setParameter("orderid", orderid);
-		return query.getResultList();
-	}
-
-	@Override
-	public List<AdBean> getCanceledAdBeans() {
-		// 暫無實作，這裡可以依需求填寫具體邏輯
-		return null;
-	}
-
-	@Override
-	public boolean updateAdBean(AdBean adBean) {
+	public boolean deleteAdBeanByAdId(Long adId) {
 		try {
-			session.update(adBean);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-
-	@Override
-	public AdBean updateAdBeanOnAdTypeAndPrice(Integer adid, Integer adtypeId) {
-		AdBean adBean = getAdBeanByAdId(adid);
-		adBean.setAdPrice(adtypeId);
-//		adBean.setAdtypeId(null);
-//		adBean.setAdtype(null);
-
-		return adBean;
-	}
-
-	@Override
-	public boolean deleteAdBeanByAdId(Integer adid) {
-		try {
-			Query<?> query = session.createQuery("delete from AdBean where adid = :adid");
-			query.setParameter("adid", adid);
+			Query<?> query = session.createQuery("delete from AdBean where adId = :adId");
+			query.setParameter("adId", adId);
 			int result = query.executeUpdate();
 			return result > 0;
 		} catch (Exception e) {
@@ -129,4 +106,28 @@ public class AdBeanDaoImpl implements AdBeanDao {
 			return false;
 		}
 	}
+
+
+	@Override
+	public AdBean editAd(Long adId, Integer newAdtypeId) {
+		// 前端取得廣告資訊 + 廣告編號
+		
+		// 取出要修改的廣告
+		String hql = "FROM AdBean a WHERE a.adId = :adId";
+		Query<AdBean> query = session.createQuery(hql, AdBean.class);
+        query.setParameter("adId", adId);
+        AdBean ad = query.getSingleResult();
+
+        // 取出選取的廣告類型
+        String adtypeHql = "From AdtypeBean adt WHERE adt.id = :adtypeId";
+     	Query<AdtypeBean> adtQuery = session.createQuery(adtypeHql, AdtypeBean.class);
+        adtQuery.setParameter("adtypeId", newAdtypeId);
+     	// 送出修改內容
+        AdtypeBean adtype = adtQuery.getSingleResult();
+        ad.setAdtype(adtype);
+        session.saveOrUpdate(ad);
+
+		return ad;
+	}
+
 }

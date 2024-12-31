@@ -1,19 +1,20 @@
 package Dao;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.hibernate.Session;
 
 import Bean.AdBean;
-import Bean.AdViewBean;
 import IMPL.AdBeanDaoImpl;
+import dto.AdDetailResponseDTO;
 
 public class AdService {
 	
 	private Logger logger = Logger.getLogger(AdService.class.getName());
-	
 	private AdBeanDao adBeanDao;
 	
 	public AdService(Session session) {
@@ -26,73 +27,16 @@ public class AdService {
 	 * @param receivedData
 	 * @return
 	 */
-	public List<AdViewBean> getFilteredAds(List<String> receivedData) {
+	public List<AdDetailResponseDTO> filterAds(Map<String, Object> filterParams) {
 		
-//		logger.info("get filtered ads: " + receivedData.toString());
+		logger.info("get filtered ads: " + filterParams.toString());
+
+		String condition = (String) filterParams.get("searchCondition");
+		String paidCondition = (String) filterParams.get("paidCondition");
+		String input = (String) filterParams.get("input");
 		
-		List<AdBean> adBeanList = new ArrayList<AdBean>();
-
-		// 沒有使用者輸入時
-		if (receivedData.get(3).equals("")) {
-			// 找已付款
-			if (receivedData.get(2).equals("paid")) {
-				adBeanList = adBeanDao.getAdBeansByIsPaid(true);
-			} else if (receivedData.get(2).equals("unpaid")) {
-				// 找未付款
-				adBeanList = adBeanDao.getAdBeansByIsPaid(false);
-			} else {
-				// 已付跟未付都找
-				adBeanList = adBeanDao.getAllAdBeans();
-			}
-			
-			return setAdsView(adBeanList);
-		}
-
-		
-		// 選擇輸入為 adId 時
-		if (receivedData.get(1).equals("adId")) {
-			// 有付款/沒付款 + user id
-			if (receivedData.get(2).equals("paid")) {
-				adBeanList = adBeanDao.getAdBeanByAdIdAndIsPaid(Integer.parseInt(receivedData.get(3)), true);
-			} else if (receivedData.get(2).equals("unpaid")) {
-				adBeanList = adBeanDao.getAdBeanByAdIdAndIsPaid(Integer.parseInt(receivedData.get(3)), false);
-			} else {
-				// 全選 + user id
-				AdBean adBean = adBeanDao.getAdBeanByAdId(Integer.parseInt(receivedData.get(3)));
-				adBeanList.add(adBean);
-			}
-			return setAdsView(adBeanList);
-		}
-
-		// 如果篩選條件 = user id
-		if (receivedData.get(1).equals("userId")) {
-			// 已付/未付 + user id
-			if (receivedData.get(2).equals("paid")) {
-				adBeanList = adBeanDao.getAdBeansByUserIdAndIsPaid(Integer.parseInt(receivedData.get(3)), true);
-			} else if (receivedData.get(2).equals("unpaid")) {
-				adBeanList = adBeanDao.getAdBeansByUserIdAndIsPaid(Integer.parseInt(receivedData.get(3)), false);
-			} else {
-				// all + user id
-				adBeanList = adBeanDao.getAdBeansByUserId(Integer.parseInt(receivedData.get(3)));
-			}
-			return setAdsView(adBeanList);
-		}
-
-		// 如果篩選條件 = house id
-		if (receivedData.get(1).equals("houseId")) {
-			// 已付/未付
-			if (receivedData.get(2).equals("paid")) {
-				adBeanList = adBeanDao.getAdBeansByHouseIdAndIsPaid(Integer.parseInt(receivedData.get(3)), true);
-			} else if (receivedData.get(2).equals("unpaid")) {
-				adBeanList = adBeanDao.getAdBeansByHouseIdAndIsPaid(Integer.parseInt(receivedData.get(3)), false);
-				// 全部 + house id
-			} else {
-				adBeanList = adBeanDao.getAdBeansByHouseId(Integer.parseInt(receivedData.get(3)));
-			}
-			return setAdsView(adBeanList);
-		}
-
-		return null;
+		List<AdBean> filterAds = adBeanDao.filterAds(condition, paidCondition, input);
+		return setupAdDetailResponseDTOs(filterAds);
 	}
 
 	/**
@@ -100,38 +44,43 @@ public class AdService {
 	 * @param receivedData
 	 * @return
 	 */
-	public AdViewBean getAdDetails(List<String> receivedData) {
+	public AdDetailResponseDTO checkAdDetails(Map<String, Object> filterParams) {
 		
-		logger.info(receivedData.toString());
+		Double adId = (Double)filterParams.get("adId");
+		Long adIdL = adId.longValue();
+		logger.info("篩選 AD ID: " + adId);
 		
-		AdBean adBean = adBeanDao.getAdBeanByAdId(Integer.valueOf(receivedData.get(1)));
-		return setAdView(adBean);
+		AdBean ad = adBeanDao.checkAdDetails(adIdL);
+		return setupAdDetailResponseDTO(ad);
 	}
 
 	/**
-	 * 接收輸入條件 receivedData ["adUpdate", "adId", "adType", "quantity"]，找到廣告並更新資料
+	 * 接收輸入條件
 	 * @param receivedData
 	 * @return
 	 */
-	public AdViewBean updateAdDetails(List<String> receivedData) {
+	public AdDetailResponseDTO editAd(Map<String, Object> params) {
+		logger.info("editAd中收到的參數: " + params.toString());
+		String adIdStr = (String)params.get("adId");
+		Long adId = Long.parseLong(adIdStr);
 		
-		logger.info(receivedData.toString());
+		String newAdtypeIdStr = (String)params.get("newAdtypeId");
+		logger.info("newAdtypeIdStr" + newAdtypeIdStr);
 		
-		String adType = (receivedData.get(2).equals("a")) ? "A廣告" : "B廣告"; // 可能要跟前端溝通名稱
-		adBeanDao.updateAdBeanOnAdTypeAndPrice(
-				Integer.parseInt(receivedData.get(1)), Integer.parseInt(receivedData.get(3))); // 要傳 adId 跟 adtypeId
-		AdBean adBean = adBeanDao.getAdBeanByAdId(Integer.parseInt(receivedData.get(1)));
-		return setAdView(adBean);
+		Integer newAdtypeId = Integer.parseInt(newAdtypeIdStr);
+		
+		AdBean editedAd = adBeanDao.editAd(adId, newAdtypeId);
+		return setupAdDetailResponseDTO(editedAd);
 	}
 
 	/**
-	 * 刪除廣告 receivedData ["delete", "adId"]
+	 * 刪除廣告 receivedData
 	 * @param receivedData
 	 * @return
 	 */
-	public boolean deleteAd(List<String> receivedData) {
-		logger.info("delete ad: " + receivedData);
-		return adBeanDao.deleteAdBeanByAdId(Integer.parseInt(receivedData.get(1)));
+	public boolean deleteAd(Long adId) {
+		logger.info("delete ad: " + adId);
+		return adBeanDao.deleteAdBeanByAdId(adId);
 	}
 	
 	
@@ -140,21 +89,25 @@ public class AdService {
 	 * @param adBean
 	 * @return
 	 */
-	private AdViewBean setAdView(AdBean adBean) {
-		AdViewBean adView = new AdViewBean();
-		adView.setAdId(adBean.getAdId());
-//		adView.setUserId(adBean.getUserId());
-		adView.setUserId((long)(adBean.getUser().getUserId()));
-		adView.setUserName(adBean.getUser().getName());
-		adView.setHouseId(adBean.getHouseId());
-		adView.setAdType(adBean.getAdtype().getAdName());
-		adView.setAdPrice(adBean.getAdPrice());
-//		adView.setSubtotal(null);
-		adView.setIsPaid(adBean.getIsPaid());
-		adView.setOrderId(adBean.getOrderId());
-		adView.setPaidDate(adBean.getPaidDate());
+	private AdDetailResponseDTO setupAdDetailResponseDTO(AdBean adBean) {
+		AdDetailResponseDTO responseDTO = new AdDetailResponseDTO();
+		responseDTO.setAdId(adBean.getAdId());
+		responseDTO.setUserId((long)(adBean.getUser().getUserId()));
+		responseDTO.setUserName(adBean.getUser().getName());
+		responseDTO.setHouseId(adBean.getHouse().getHouseId());
+		responseDTO.setHouseTitle(adBean.getHouse().getTitle());
+		responseDTO.setAdtypeName(adBean.getAdtype().getAdName());
+//		responseDTO.setAdPrice(adBean.getAdPrice());
+		responseDTO.setIsPaid(adBean.getIsPaid());
+		responseDTO.setOrderId(adBean.getOrderId());
+		responseDTO.setPaidDate(adBean.getPaidDate());
 		
-		return adView;
+		if(adBean.getIsPaid()) {
+			ZonedDateTime expiryDate = calculateExpiryDate(adBean.getPaidDate(), adBean.getAdtype().getAdName());
+			responseDTO.setExpiryDate(expiryDate);
+		}
+		
+		return responseDTO;
 	}
 	
 	/**
@@ -162,14 +115,24 @@ public class AdService {
 	 * @param adBeanList
 	 * @return
 	 */
-	private List<AdViewBean> setAdsView(List<AdBean> adBeanList) {
-		List<AdViewBean> adsView = new ArrayList<AdViewBean>();
-		for(AdBean adBean : adBeanList) {
-			AdViewBean adView = setAdView(adBean);
-			adsView.add(adView);
+	private List<AdDetailResponseDTO> setupAdDetailResponseDTOs(List<AdBean> ads) {
+		List<AdDetailResponseDTO> responseDTOs = new ArrayList<AdDetailResponseDTO>();
+		for(AdBean adBean : ads) {
+			AdDetailResponseDTO responseDTO = setupAdDetailResponseDTO(adBean);
+			responseDTOs.add(responseDTO);
 		}
 		
-		return adsView;
+		return responseDTOs;
 	}
 
+	private ZonedDateTime calculateExpiryDate(ZonedDateTime paidDate, String adName) {
+		String numericPart = adName.replaceAll("\\D+","");
+		
+		int days = Integer.parseInt(numericPart);
+		logger.info("要轉換的廣告天數 " + days);
+		
+		ZonedDateTime expiryDate = paidDate.plusDays(days);
+		
+		return expiryDate;
+	}
 }

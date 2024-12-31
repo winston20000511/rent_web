@@ -116,7 +116,7 @@ body {
 					<%= request.getAttribute("loginError") != null ? request.getAttribute("loginError") : "" %>
 				</p>
 				<button type="submit" class="btn btn-login">登入</button>
-			<a class="registeratag" href="http://localhost:8888/rent_web/backstage-register.jsp">註冊</a>
+			<a class="registeratag" href="http://localhost:8080/rent_web/backstage-register.jsp">註冊</a>
 			</form>
 			
 				

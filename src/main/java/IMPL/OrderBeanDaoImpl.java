@@ -1,3 +1,4 @@
+
 package IMPL;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import org.hibernate.query.Query;
 
 import Bean.OrderBean;
 import Dao.OrderBeanDao;
-import DTO.OrderDetailsDTO;
+import dto.OrderDetailsResponseDTO;
 
 public class OrderBeanDaoImpl implements OrderBeanDao{
 	
@@ -18,151 +19,95 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 	public OrderBeanDaoImpl(Session session) {
 		this.session = session;
 	}
-
 	
 	@Override
-	public List<OrderBean> getAllOrderBeans() {
-		Query<OrderBean> orderBeans = session.createQuery("from OrderBean", OrderBean.class);
-		
-		List<OrderBean> orders = orderBeans.list();
-		for(OrderBean order : orders) {
-			logger.info("取得的order beans: " + order.getMerchantTradNo());
-		}
-		
-		return orderBeans.list();
-	}
-	
-	@Override
-	public OrderBean getOrderBeanByTradNo(String tradeNo) {
-		Query<OrderBean> query = session.createQuery("from OrderBean where merchanttradno=:merchanttradno", OrderBean.class);
-		query.setParameter("merchanttradno", tradeNo);
-		return query.getSingleResult();
+	public List<OrderBean> getAllOrders() {
+		Query<OrderBean> query = session.createQuery("from OrderBean", OrderBean.class);
+		return query.getResultList();
 	}
 
 	@Override
-	public List<OrderDetailsDTO> getOrderTableData() {
-		
-		String hqlstr = 
-			    "select o.userId, o.merchantTradNo, o.merchantTradDate, o.choosePayment, o.orderStatus, " +
-			    "u.name, a.adId, adt.adName " +
-			    "from OrderBean o " +
-			    "join o.user u " +
-			    "join o.ads a " +
-			    "join a.adtype adt";
-		Query<OrderDetailsDTO> query = session.createQuery(hqlstr);
-		return query.list();
-	}
-
-
-	@Override
-	public List<OrderDetailsDTO> getOrderTableDataByTradNo(String tradNo) {
-		String hqlstr = 
-			    "select o.userId, o.merchantTradNo, o.merchantTradDate, o.choosePayment, o.orderStatus, " +
-			    "u.name, a.adId, adt.adName " +
-			    "from OrderBean o " +
-			    "join o.user u " +
-			    "join o.ads a " +
-			    "join a.adtype adt";
-		
-		Query<OrderDetailsDTO> query = session.createQuery(hqlstr, OrderDetailsDTO.class);
-		query.setParameter("merchantTradNo", tradNo);
-		
-		return query.list();
-	}
-	
-	@Override
-	public List<OrderDetailsDTO> getOrderTableDataByUserId(Integer userId) {
-	    String hqlstr = 
-	        "select o.userId, o.merchantTradNo, o.merchantTradDate, o.orderStatus "
-	        + "from OrderBean o where o.userId = :userId order by o.merchantTradDate";
+	public List<OrderBean> filterOrders(String searchCondition, String orderStatus, String input) {
 	    
-	    Query<OrderDetailsDTO> query = session.createQuery(hqlstr, OrderDetailsDTO.class);
-	    query.setParameter("userId", userId);
-	    
-	    return query.list();
-	}
+		StringBuilder hqlstr = new StringBuilder("FROM OrderBean o ");
+		
+		boolean hasCondition = false;
 
-	// 用 DTO 接
-	@Override
-	public List<OrderDetailsDTO> getOrderTableDataByOrderStatus(Short orderStatus) {
-	    String hqlstr = 
-	        "select o.userId, o.merchantTradNo, o.merchantTradDate, o.orderStatus "
-	        + "from OrderBean o where o.orderStatus = :orderStatus order by o.merchantTradDate";
-	    
-	    try {
-	        Query<OrderDetailsDTO> query = session.createQuery(hqlstr, OrderDetailsDTO.class);
-	        query.setParameter("orderStatus", orderStatus);
-	        return query.list();
-	    } catch (Exception exception) {
-	        exception.printStackTrace();
-	        logger.severe("get order table data by order status error");
+	    // 根據 searchCondition 和 input 添加條件
+	    if (searchCondition != null && input != null && !input.isEmpty()) {
+	        if (searchCondition.equals("merchantTradNo")) {
+	        	hqlstr.append(hasCondition ? " AND " : " WHERE ");
+	        	hqlstr.append("o.merchantTradNo LIKE :input ");
+	        	hasCondition = true;
+	        } else if (searchCondition.equals("userId")) {
+	        	hqlstr.append(hasCondition ? " AND " : " WHERE ");
+	        	hqlstr.append("CAST(o.userId AS string) LIKE :input ");
+	        	hasCondition = true;
+	        }
+	    }
+
+	    // 根據 orderStatus 添加條件
+	    if (orderStatus != null && !orderStatus.equals("all") && !orderStatus.isEmpty()) {
+	    	hqlstr.append(hasCondition ? " AND " : " WHERE ");
+	        hqlstr.append("o.orderStatus = :orderStatus ");
 	    }
 	    
-	    return null;
-	}
+	    logger.info("HQL 查詢字串: " + hqlstr.toString());
 
-	@Override
-	public List<OrderDetailsDTO> getOrderTableDataByTradNoAndOrderStatus(String tradNo, Integer orderStatus) {
-	    String hqlstr = 
-	            "select o.userId, o.merchantTradNo, o.merchantTradDate, o.orderStatus "
-	            + "from OrderBean o where o.merchantTradNo = :merchantTradNo and o.orderStatus = :orderStatus "
-	            + "order by o.merchantTradDate";
-	    
-	    try {
-	        Query<OrderDetailsDTO> query = session.createQuery(hqlstr, OrderDetailsDTO.class);
-	        query.setParameter("merchantTradNo", tradNo);
+	    // 創建 Query 物件
+	    Query<OrderBean> query = session.createQuery(hqlstr.toString(), OrderBean.class);
+
+	    if (searchCondition != null && input != null && !input.isEmpty()) {
+	    	if(searchCondition.equals("merchantTradNo")) {
+	    		query.setParameter("input", "%" + input + "%");
+	    	}
+	    	
+	    	if(searchCondition.equals("userId")) {
+	    		query.setParameter("input", "%" + input + "%");
+	    	}
+	    }
+
+	    if (orderStatus != null && !orderStatus.isEmpty() && !orderStatus.equals("all")) {
 	        query.setParameter("orderStatus", orderStatus);
-	        return query.list();
-	    } catch (Exception exception) {
-	        exception.printStackTrace();
-	        logger.severe("get order table data by order status error");
 	    }
 	    
-	    return null;
+	    // 返回結果
+	    List<OrderBean> resultList = query.getResultList();
+	    return resultList;
 	}
 
-	@Override
-	public List<OrderDetailsDTO> getOrderTableDataByUserIdAndOrderStatus(Integer userId, Integer orderStatus) {
-	    String hqlstr = 
-	            "select o.userId, o.merchantTradNo, o.merchantTradDate, o.orderStatus "
-	            + "from OrderBean o where o.userId = :userId and o.orderStatus = :orderStatus "
-	            + "order by o.merchantTradDate";
-	    
-	    try {
-	        Query<OrderDetailsDTO> query = session.createQuery(hqlstr, OrderDetailsDTO.class);
-	        query.setParameter("userId", userId);
-	        query.setParameter("orderStatus", orderStatus);
-	        return query.list();
-	    } catch (Exception exception) {
-	        exception.printStackTrace();
-	        logger.severe("get order table data by user id and order status error");
-	    }
-	    
-	    return null;
-	}
 
-	
+
+
 	@Override
-	public OrderDetailsDTO getOrderAdCombinedDataByTradNo(String tradNo){
-	    String hqlstr = "select o.userid, o.merchanttradno, o.merchanttraddate, "
-                + "o.choosepayment, o.orderstatus, o.totalamount, "
-                + "a.username, a.houseid, a.adid, a.adtype, "
-                + "a.adduration, a.adprice, a.quantity "
-                + "from OrderBean o join o.ads a "
-                + "where o.merchanttradno = :merchanttradno";
+	public OrderDetailsResponseDTO getOrderAdCombinedDataByTradNo(String orderId){
+		String hqlstr = "select o.merchantTradNo, o.merchantTradDate, o.choosePayment, "
+	              + "o.orderStatus, o.totalAmount, o.user.userName, "
+	              + "a.adId, a.adtype, a.adPrice "
+	              + "from OrderBean o join o.ads a "
+	              + "where o.merchantTradNo = :orderId";
 	    
-	    Query<OrderDetailsDTO> query = session.createQuery(hqlstr, OrderDetailsDTO.class);
-	    query.setParameter("merchanttradno", tradNo);
+	    Query<OrderDetailsResponseDTO> query = session.createQuery(hqlstr, OrderDetailsResponseDTO.class);
+	    query.setParameter("merchantTradNo", orderId);
 
 	    return query.getSingleResult();
 	}
 
 
 	@Override
-	public OrderBean cancelOrderStatusByTradNo(String tradNo) {
-		OrderBean orderBean = getOrderBeanByTradNo(tradNo);
+	public OrderBean cancelOrderStatusByTradNo(String orderId) {
+		OrderBean orderBean = getOrderBeanByTradNo(orderId);
 		orderBean.setOrderStatus((short)0);
 		return orderBean;
 	}
 
+	@Override
+	public OrderBean getOrderBeanByTradNo(String orderId) {
+		Query<OrderBean> query = session.createQuery("from OrderBean where merchantTradNo=:merchantTradNo", OrderBean.class);
+		query.setParameter("merchantTradNo", orderId);
+		return query.getSingleResult();
+	}
+
+
 }
+
