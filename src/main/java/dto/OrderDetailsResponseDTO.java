@@ -29,6 +29,7 @@ public class OrderDetailsResponseDTO {
 	public void setOrderStatus(Short orderStatus) {
 		if(orderStatus == (short)0) this.orderStatus = "已取消";
 		if(orderStatus == (short)1) this.orderStatus =  "一般訂單";
+		if(orderStatus == (short)2) this.orderStatus =  "申請取消";
 	}
 	
 	public void setPaymentMethod(String paymentMethod) {

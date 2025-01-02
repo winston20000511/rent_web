@@ -226,9 +226,10 @@ function cancelOrder(orderId) {
 				if (response.orderStatus === "已取消") {
 					alert("訂單已成功取消");
 					disableButton(".delete-btn[data-id='" + orderId + "']");
-					disableButton(".cancel-order[data-id='" + orderId + "']");
+					// disableButton(".cancel-order[data-id='" + orderId + "']");
 					setupOrderDetailsModal(response);
 					setupAdInfoForOrderDetailsModal(response);
+					filterOrders();
 				} else {
 					alert("取消訂單失敗: " + response.message);
 				}

@@ -49,6 +49,7 @@ function initAdTable() {
                 searching: false,
                 pageLength: 20,
                 dom: '<f><t><i><p>', //l:length不使用;控制一次展示幾筆
+				"order": [[5, 'desc']],
                 columns: [
                     { data: "adId" },
                     { data: "userId" },

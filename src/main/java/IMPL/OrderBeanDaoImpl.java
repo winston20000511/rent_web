@@ -52,6 +52,8 @@ public class OrderBeanDaoImpl implements OrderBeanDao{
 	        hqlstr.append("o.orderStatus = :orderStatus ");
 	    }
 	    
+	    hqlstr.append(" ORDER BY o.merchantTradDate DESC");
+	    
 	    logger.info("HQL 查詢字串: " + hqlstr.toString());
 
 	    // 創建 Query 物件
