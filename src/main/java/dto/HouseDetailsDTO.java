@@ -1,5 +1,4 @@
-
-package dto;
+package DTO;
 
 import lombok.Data;
 
@@ -93,3 +92,5 @@ public class HouseDetailsDTO {
 
 
 	}
+
+
